@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!--#region VerticalStackLayout -->
+    <!--<Style TargetType="VerticalStackLayout">
+        <Setter Property="VerticalOptions"
+                Value="CenterAndExpand"/>
+    </Style>-->
+    <!--#endregion-->
+
+    <!--#region Labels -->
+    <Style TargetType="Label">
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource DarkText},
+                                        Dark={StaticResource DarkText}}"/>
+    </Style>
+
+    <Style Class="Header" TargetType="Label">
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="Title"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <Style Class="SubHeader" TargetType="Label">
+        <Setter Property="FontSize" Value="Medium"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <Style Class="CardTitle" TargetType="Label">
+        <Setter Property="FontSize" Value="Medium"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+    <!--#endregion-->
+
+    <!--#region Buttons -->
+    <Style x:Key="BaseButton" TargetType="Button">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource DarkMain},
+                                        Dark={StaticResource DarkMain}}"/>
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource DarkText},
+                                        Dark={StaticResource DarkText}}"/>
+        <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+        <Setter Property="VerticalOptions" Value="Start"/>
+        <Setter Property="HeightRequest" Value="50"/>
+        <Setter Property="Margin" Value="10,10,10,10"/>
+    </Style>
+
+    <Style BasedOn="{StaticResource BaseButton}" TargetType="Button"/>
+
+    <EllipseGeometry
+        x:Key="circle"
+        Center="50,50"
+        RadiusX="30"
+        RadiusY="30"/>
+
+    <Style x:Key="CircularButton" TargetType="Button">
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="Large"/>
+        <Setter Property="HeightRequest" Value="100"/>
+        <Setter Property="WidthRequest" Value="100"/>
+        <Setter Property="VerticalOptions" Value="End"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="Clip" Value="{StaticResource circle}"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource LightMain}"/>
+    </Style>
+    <!--#endregion-->
+
+    <!--#region Misc -->
+    <Shadow x:Key="shadow"
+        Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
+        Opacity=".6"
+        Radius="15"
+        Offset="10,15"/>
+    
+    <Style TargetType="RoundRectangle">
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource DarkMain},
+                                        Dark={StaticResource DarkMain}}"/>
+        <Setter Property="WidthRequest" Value="200"/>
+        <Setter Property="Shadow" Value="{StaticResource shadow}"/>
+    </Style>
+
+    <Style x:Key="Task" TargetType="Entry">
+        <Setter Property="FontSize" Value="Large"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="PlaceholderColor" Value="{StaticResource LightText}"/>
+    </Style>
+
+    <Style Class="ListFrame" TargetType="Frame">
+        <Setter Property="BorderColor" Value="Transparent"/>
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource DarkMain}"/>
+    </Style>
+    <!--#endregion-->
+
+</ResourceDictionary>
