@@ -1,4 +1,5 @@
-﻿using GeneralApp.MVVM.Models;
+﻿using CommunityToolkit.Mvvm.Input;
+using GeneralApp.MVVM.Models;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 
@@ -7,13 +8,41 @@ namespace GeneralApp.MVVM.ViewModels
     [AddINotifyPropertyChangedInterface]
     class TaskerHomeViewModel
     {
+        public bool _isRefreshing;
+        public bool IsRefreshing 
+        {
+            get => _isRefreshing; 
+            set => _isRefreshing = value;
+        }
+
         public ObservableCollection<Category> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
+
+        public IAsyncRelayCommand PullToRefreshCommand { get; set; }
+
 
         public TaskerHomeViewModel()
         {
             FillData();
             Tasks.CollectionChanged += Tasks_CollectionChanged;
+
+            PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
+        }
+
+        private bool _canExecPullToRefreshCommand = true;
+        private bool CanExecPullToRefreshCommand() => _canExecPullToRefreshCommand;
+        private async Task ExecPullToRefreshCommand()
+        {
+            if (_canExecPullToRefreshCommand)
+            {
+                _canExecPullToRefreshCommand = false;
+
+                UpdateData();
+                //Delay to check functionality
+                await Task.Delay(2000);
+                IsRefreshing = false;
+                _canExecPullToRefreshCommand = true;
+            }
         }
 
         private void Tasks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

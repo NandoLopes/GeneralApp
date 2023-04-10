@@ -33,34 +33,43 @@
         </Grid>
         <Grid Grid.Row="1" RowDefinitions=".2*, .8*">
             <Label StyleClass="SubHeader" Text="PENDING TASKS"/>
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Tasks}"
+
+            <RefreshView Grid.Row="1"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                RefreshColor="{StaticResource Primary}"
+                IsRefreshing="{x:Binding IsRefreshing}"
+                Command="{x:Binding PullToRefreshCommand}">
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Tasks}"
                             ItemsUpdatingScrollMode="KeepLastItemInView">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame StyleClass="ListFrame">
-                            <HorizontalStackLayout>
-                                <CheckBox 
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame StyleClass="ListFrame">
+                                <HorizontalStackLayout>
+                                    <CheckBox 
                                     x:Name="checkBox"
                                     IsChecked="{Binding Completed}"
                                     VerticalOptions="Center"
                                     CheckedChanged="checkBox_CheckedChanged"
                                     Color="{Binding TaskColor, Converter={StaticResource ColorConverter}}"/>
-                                <Label Text="{Binding Name}" VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger
+                                    <Label Text="{Binding Name}" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger
                                             Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
                                             TargetType="Label"
                                             Value="True">
-                                            <Setter Property="TextDecorations"
+                                                <Setter Property="TextDecorations"
                                                     Value="Strikethrough"/>
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </HorizontalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </HorizontalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
         </Grid>
         <Button
             Grid.Row="1"
