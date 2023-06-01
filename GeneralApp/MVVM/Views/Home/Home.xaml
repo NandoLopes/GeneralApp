@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GeneralApp.MVVM.Home.Home"
              Title="Home">
-    <Grid Margin="15" RowDefinitions=".1*, .9*">
+    <Grid Margin="15" RowDefinitions=".05*, .9*">
         <Label 
             StyleClass="Header"
             Text="Welcome to General App!"
@@ -12,12 +12,16 @@
             HorizontalOptions="Center"/>
         <Grid Grid.Row="1" RowDefinitions=".1*, .9*">
             <Label Margin="10" StyleClass="SubHeader" Text="What do you need?"/>
-            <CollectionView Grid.Row="1" ItemsSource="{Binding FunctionsList}">
+            <CollectionView Grid.Row="1"
+                            x:Name="collectionView"
+                            ItemsSource="{Binding FunctionsList}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Button Text="{Binding Name}"
-                                Clicked="ButtonTaskPage"
-                                ClassId="{Binding Id}"/>
+                                Command="{Binding Path=BindingContext.NavigateButtonCommand, Source={x:Reference collectionView}}"
+                                CommandParameter="{Binding .}"
+                                ClassId="{Binding Id}"
+                                HeightRequest="70"/>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

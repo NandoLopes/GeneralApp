@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GeneralApp.MVVM.Views.TaskManager.TaskerHomeView"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:converters="clr-namespace:GeneralApp.Shared.Converters"
              Title="Tasks" StyleClass="Header">
 
@@ -35,6 +36,7 @@
             <Label StyleClass="SubHeader" Text="PENDING TASKS"/>
 
             <RefreshView Grid.Row="1"
+                         x:Name="refreshView"
                 VerticalOptions="FillAndExpand"
                 HorizontalOptions="FillAndExpand"
                 RefreshColor="{StaticResource Primary}"
@@ -51,8 +53,13 @@
                                     x:Name="checkBox"
                                     IsChecked="{Binding Completed}"
                                     VerticalOptions="Center"
-                                    CheckedChanged="checkBox_CheckedChanged"
-                                    Color="{Binding TaskColor, Converter={StaticResource ColorConverter}}"/>
+                                    Color="{Binding TaskColor, Converter={StaticResource ColorConverter}}">
+                                        <CheckBox.Behaviors>
+                                            <toolkit:EventToCommandBehavior
+                                                EventName="CheckedChanged"
+                                                Command="{Binding BindingContext.CheckedChangedCommand, Source={x:Reference refreshView} }" />
+                                        </CheckBox.Behaviors>
+                                    </CheckBox>
                                     <Label Text="{Binding Name}" VerticalOptions="Center">
                                         <Label.Triggers>
                                             <DataTrigger
@@ -73,7 +80,7 @@
         </Grid>
         <Button
             Grid.Row="1"
-            Clicked="Button_Clicked"
+            Command="{Binding NavigateButtonCommand}"
             Style="{StaticResource CircularButton}"
             Text="+"/>
     </Grid>

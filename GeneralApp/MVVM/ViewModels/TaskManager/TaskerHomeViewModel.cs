@@ -1,32 +1,31 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GeneralApp.Interfaces;
 using GeneralApp.MVVM.Models;
+using GeneralApp.MVVM.Views.TaskManager;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 
 namespace GeneralApp.MVVM.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    class TaskerHomeViewModel
+    public partial class TaskerHomeViewModel : ViewModelBase
     {
-        public bool _isRefreshing;
-        public bool IsRefreshing 
-        {
-            get => _isRefreshing; 
-            set => _isRefreshing = value;
-        }
+        public bool IsRefreshing { get; set; }
 
         public ObservableCollection<Category> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
+        private readonly INavigationService _navigationService;
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
 
-        public TaskerHomeViewModel()
+        public TaskerHomeViewModel(INavigationService navigationService)
         {
             FillData();
             Tasks.CollectionChanged += Tasks_CollectionChanged;
 
             PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
+            _navigationService = navigationService;
         }
 
         private bool _canExecPullToRefreshCommand = true;
@@ -39,11 +38,17 @@ namespace GeneralApp.MVVM.ViewModels
 
                 UpdateData();
                 //Delay to check functionality
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 IsRefreshing = false;
                 _canExecPullToRefreshCommand = true;
             }
         }
+
+        [RelayCommand]
+        private async Task NavigateButton() => await _navigationService.NavigateToPage<NewTaskView>();
+
+        [RelayCommand]
+        private void CheckedChanged() => UpdateData();
 
         private void Tasks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -130,7 +135,7 @@ namespace GeneralApp.MVVM.ViewModels
                 var notCompleted = tasks.Where(t => t.Completed == false);
 
                 category.PendingTasks = notCompleted.Count();
-                category.Percentage = (float)completed.Count()/(float)tasks.Count();
+                category.Percentage = (float)completed.Count() / (float)tasks.Count();
             }
 
             foreach (var task in Tasks)

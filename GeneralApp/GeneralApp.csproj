@@ -49,6 +49,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.1.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0-preview2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
@@ -70,8 +71,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="MVVM\Views\Home\MainHomeView.xaml.cs">
-	    <DependentUpon>MainHomeView.xaml</DependentUpon>
+	  <Compile Update="MVVM\Views\Home\Home.xaml.cs">
+	    <DependentUpon>Home.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
