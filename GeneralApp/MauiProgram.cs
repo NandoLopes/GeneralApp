@@ -4,7 +4,7 @@ using GeneralApp.MVVM.Home;
 using GeneralApp.MVVM.ViewModels;
 using GeneralApp.MVVM.ViewModels.ColorPicker;
 using GeneralApp.MVVM.ViewModels.TaskManager;
-﻿using Microsoft.Extensions.Logging;
+using GeneralApp.MVVM.Views.ColorPicker;
 using GeneralApp.MVVM.Views.TaskManager;
 using GeneralApp.Services;
 using Microsoft.Extensions.Logging;
@@ -17,13 +17,13 @@ public static class MauiProgram
 	{
 		var builder = MauiApp.CreateBuilder();
 
-        builder
+		builder
 			.UseMauiApp<App>()
 			.RegisterViewModels()
 			.RegisterViews()
 			.RegisterServices()
             .UseMauiCommunityToolkit()
-			.ConfigureFonts(fonts =>
+            .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
@@ -34,7 +34,7 @@ public static class MauiProgram
 #endif
 
 		return builder.Build();
-	}
+    }
 
     #region Services
 
@@ -54,6 +54,7 @@ public static class MauiProgram
 		mauiAppBuilder.Services.AddSingleton<HomeViewModel>();
 		mauiAppBuilder.Services.AddSingleton<TaskerHomeViewModel>();
 		mauiAppBuilder.Services.AddSingleton<NewTaskViewModel>();
+		mauiAppBuilder.Services.AddSingleton<ColorPickerViewModel>();
 		return mauiAppBuilder;
 	}
 
@@ -66,6 +67,7 @@ public static class MauiProgram
 		mauiAppBuilder.Services.AddSingleton<Home>();
 		mauiAppBuilder.Services.AddSingleton<TaskerHomeView>();
 		mauiAppBuilder.Services.AddSingleton<NewTaskView>();
+		mauiAppBuilder.Services.AddSingleton<ColorPickerView>();
 		return mauiAppBuilder;
 	}
 

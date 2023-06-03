@@ -38,8 +38,8 @@ namespace GeneralApp.MVVM.ViewModels
             {
                 new AppFunction{ Id = 1, Name = "Task Manager" },
                 new AppFunction { Id = 2, Name = "Calculator" },
-                new AppFunction { Id = 3, Name = "Not Implemented" },
-                new AppFunction { Id = 4, Name = "To be done" }
+                new AppFunction { Id = 4, Name = "Color Picker" },
+                new AppFunction { Id = 3, Name = "Not Implemented" }
             };
         }
     }
