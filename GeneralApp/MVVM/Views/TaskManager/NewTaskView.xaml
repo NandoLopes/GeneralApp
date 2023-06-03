@@ -6,7 +6,7 @@
 
     <Grid RowDefinitions=".2*, .7*, .1*">
         <Entry Placeholder="Enter New Task"
-               Text="{Binding Task}"
+               Text="{Binding NewTask}"
                Style="{StaticResource Task}"/>
         <CollectionView 
             Grid.Row="1"

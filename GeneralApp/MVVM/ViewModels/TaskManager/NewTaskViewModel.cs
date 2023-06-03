@@ -5,7 +5,7 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
 {
     public class NewTaskViewModel
     {
-        public string Task { get; set; }
+        public string NewTask { get; set; }
         public ObservableCollection<Category> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
     }

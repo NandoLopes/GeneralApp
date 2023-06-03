@@ -1,31 +1,32 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using GeneralApp.Interfaces;
 using GeneralApp.MVVM.Models;
-using GeneralApp.MVVM.Views.TaskManager;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 
 namespace GeneralApp.MVVM.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    public partial class TaskerHomeViewModel : ViewModelBase
+    class TaskerHomeViewModel
     {
-        public bool IsRefreshing { get; set; }
+        public bool _isRefreshing;
+        public bool IsRefreshing
+        {
+            get => _isRefreshing;
+            set => _isRefreshing = value;
+        }
 
         public ObservableCollection<Category> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
-        private readonly INavigationService _navigationService;
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
 
-        public TaskerHomeViewModel(INavigationService navigationService)
+        public TaskerHomeViewModel()
         {
             FillData();
             Tasks.CollectionChanged += Tasks_CollectionChanged;
 
             PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
-            _navigationService = navigationService;
         }
 
         private bool _canExecPullToRefreshCommand = true;
@@ -43,12 +44,6 @@ namespace GeneralApp.MVVM.ViewModels
                 _canExecPullToRefreshCommand = true;
             }
         }
-
-        [RelayCommand]
-        private async Task NavigateButton() => await _navigationService.NavigateToPage<NewTaskView>();
-
-        [RelayCommand]
-        private void CheckedChanged() => UpdateData();
 
         private void Tasks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
