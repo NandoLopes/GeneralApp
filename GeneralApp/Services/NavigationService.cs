@@ -111,7 +111,7 @@ namespace GeneralApp.Services
             return Task.CompletedTask;
         }
 
-        private ViewModelBase? GetPageViewModelBase(Page? p)
+        public ViewModelBase? GetPageViewModelBase(Page? p)
             => p?.BindingContext as ViewModelBase;
 
         private T? ResolvePage<T>() where T : Page

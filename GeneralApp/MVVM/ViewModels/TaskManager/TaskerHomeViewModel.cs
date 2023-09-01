@@ -6,20 +6,14 @@ using System.Collections.ObjectModel;
 namespace GeneralApp.MVVM.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    class TaskerHomeViewModel
+    public class TaskerHomeViewModel
     {
-        public bool _isRefreshing;
-        public bool IsRefreshing
-        {
-            get => _isRefreshing;
-            set => _isRefreshing = value;
-        }
+        public bool IsRefreshing { get; set; }
 
         public ObservableCollection<Category> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
-
 
         public TaskerHomeViewModel()
         {

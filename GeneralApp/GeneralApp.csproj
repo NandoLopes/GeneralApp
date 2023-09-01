@@ -83,4 +83,8 @@
 	  <Folder Include="MVVM\Views\Template\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
 </Project>

@@ -5,21 +5,22 @@ namespace GeneralApp.MVVM.Views.TaskManager;
 
 public partial class NewTaskView : ContentPage
 {
-	public NewTaskView()
+    private readonly NewTaskViewModel _newTaskViewModel;
+
+    public NewTaskView(NewTaskViewModel newTaskViewModel)
 	{
 		InitializeComponent();
-	}
+        _newTaskViewModel = newTaskViewModel;
+		BindingContext = _newTaskViewModel;
+    }
 
     private async void AddTaskClicked(object sender, EventArgs e)
     {
-		var viewModel = BindingContext as NewTaskViewModel;
-
-
 		//TODO - Remove "IsSelected" property.
 		var selectedCategory =
-			viewModel.Categories.Where(x => x.IsSelected == true).FirstOrDefault();
+            _newTaskViewModel.Categories.Where(x => x.IsSelected == true).FirstOrDefault();
 
-		if (string.IsNullOrEmpty(viewModel.NewTask))
+		if (string.IsNullOrEmpty(_newTaskViewModel.NewTask))
 		{
             await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
         }
@@ -28,16 +29,16 @@ public partial class NewTaskView : ContentPage
         {
 			await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
 		}
-		else if (selectedCategory != null && !string.IsNullOrEmpty(viewModel.NewTask))
+		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask))
 		{
 			var task = new MyTask
 			{
-				Id = viewModel.Tasks.Count + 1,
-				Name = viewModel.NewTask,
+				Id = _newTaskViewModel.Tasks.Count + 1,
+				Name = _newTaskViewModel.NewTask,
 				CategoryId = selectedCategory.Id
 			};
 
-			viewModel.Tasks.Add(task);
+			_newTaskViewModel.Tasks.Add(task);
 			await Navigation.PopAsync();
 		}
 		else
@@ -48,8 +49,6 @@ public partial class NewTaskView : ContentPage
 
     private async void AddCategoryClicked(object sender, EventArgs e)
     {
-        var viewModel = BindingContext as NewTaskViewModel;
-
 		string category =
 			await DisplayPromptAsync("New Category",
 			"Write the new category name",
@@ -61,9 +60,9 @@ public partial class NewTaskView : ContentPage
 
 		if(!string.IsNullOrEmpty(category))
 		{
-			viewModel.Categories.Add(new Category
+			_newTaskViewModel.Categories.Add(new Category
 			{
-				Id = viewModel.Categories.Count + 1,
+				Id = _newTaskViewModel.Categories.Count + 1,
 				Name = category,
 				Color = Color.FromRgb(
 					r.Next(0, 255),

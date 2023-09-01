@@ -1,34 +1,35 @@
+using GeneralApp.Interfaces;
+using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.ViewModels;
-using GeneralApp.MVVM.ViewModels.TaskManager;
+using System.Collections.ObjectModel;
 
 namespace GeneralApp.MVVM.Views.TaskManager;
 
 public partial class TaskerHomeView : ContentPage
 {
-    private TaskerHomeViewModel taskerHomeViewModel = new TaskerHomeViewModel();
+    private readonly TaskerHomeViewModel _taskerHomeViewModel;
+    private readonly INavigationService _navigationService;
 
-    public TaskerHomeView()
+    public TaskerHomeView(
+        TaskerHomeViewModel taskerHomeViewModel,
+        INavigationService navigationService
+        )
     {
         InitializeComponent();
-        BindingContext = taskerHomeViewModel;
+        _taskerHomeViewModel = taskerHomeViewModel;
+        _navigationService = navigationService;
+        BindingContext = _taskerHomeViewModel;
     }
 
     private void checkBox_CheckedChanged(object sender, EventArgs e)
     {
-        taskerHomeViewModel.UpdateData();
+        _taskerHomeViewModel.UpdateData();
     }
 
-    private void Button_Clicked(object sender, EventArgs e)
+    private async void Button_Clicked(object sender, EventArgs e)
     {
-        var taskView = new NewTaskView
-        {
-            BindingContext = new NewTaskViewModel
-            {
-                Tasks = taskerHomeViewModel.Tasks,
-                Categories = taskerHomeViewModel.Categories
-            }
-        };
-
-        Navigation.PushAsync(taskView);
+        await _navigationService.NavigateToPage<NewTaskView>(
+                new Tuple<ObservableCollection<MyTask>, ObservableCollection<Category>>(_taskerHomeViewModel.Tasks, _taskerHomeViewModel.Categories)
+            );
     }
 }

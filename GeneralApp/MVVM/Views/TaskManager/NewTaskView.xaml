@@ -11,7 +11,9 @@
         <CollectionView 
             Grid.Row="1"
             Margin="15"
-            ItemsSource="{Binding Categories}">
+            ItemsSource="{Binding Categories}"
+            SelectedItem="{Binding SelectedCategory}"
+            SelectionMode="Single">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout
                     HorizontalItemSpacing="5"
