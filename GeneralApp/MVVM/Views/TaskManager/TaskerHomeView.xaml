@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GeneralApp.MVVM.Views.TaskManager.TaskerHomeView"
              xmlns:converters="clr-namespace:GeneralApp.Shared.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="Tasks" StyleClass="Header">
 
     <ContentPage.Resources>
@@ -20,7 +21,8 @@
                     <DataTemplate>
                         <Grid Padding="10">
                             <RoundRectangle/>
-                            <VerticalStackLayout Padding="15" Spacing="10">
+                            <VerticalStackLayout Padding="15" 
+                                                 Spacing="10">
                                 <Label Text="{Binding PendingTasks, StringFormat='{0} Tasks'}"/>
                                 <Label StyleClass="CardTitle"
                                        Text="{Binding Name}"/>
@@ -42,7 +44,8 @@
                 Command="{x:Binding PullToRefreshCommand}">
 
                 <CollectionView Grid.Row="1" ItemsSource="{Binding Tasks}"
-                            ItemsUpdatingScrollMode="KeepLastItemInView">
+                                x:Name="collectionView"
+                                ItemsUpdatingScrollMode="KeepLastItemInView">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame StyleClass="ListFrame">
@@ -51,8 +54,14 @@
                                     x:Name="checkBox"
                                     IsChecked="{Binding Completed}"
                                     VerticalOptions="Center"
-                                    CheckedChanged="checkBox_CheckedChanged"
-                                    Color="{Binding TaskColor, Converter={StaticResource ColorConverter}}"/>
+                                    Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
+                                        <CheckBox.Behaviors>
+                                            <toolkit:EventToCommandBehavior EventName="CheckedChanged"
+                                                Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.CheckedChangedCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </CheckBox.Behaviors>
+                                    </CheckBox>
+                                    
                                     <Label Text="{Binding Name}" VerticalOptions="Center">
                                         <Label.Triggers>
                                             <DataTrigger
@@ -77,4 +86,7 @@
             Style="{StaticResource CircularButton}"
             Text="+"/>
     </Grid>
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
 </ContentPage>

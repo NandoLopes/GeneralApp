@@ -6,19 +6,19 @@ using System.Collections.ObjectModel;
 namespace GeneralApp.MVVM.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    public class TaskerHomeViewModel
+    public partial class TaskerHomeViewModel : ViewModelBase
     {
         public bool IsRefreshing { get; set; }
 
-        public ObservableCollection<Category> Categories { get; set; }
+        public ObservableCollection<TaskCategory> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
         public TaskerHomeViewModel()
         {
-            FillData();
-            Tasks.CollectionChanged += Tasks_CollectionChanged;
+            Categories = new();
+            Tasks = new();
 
             PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
         }
@@ -31,7 +31,7 @@ namespace GeneralApp.MVVM.ViewModels
             {
                 _canExecPullToRefreshCommand = false;
 
-                UpdateData();
+                FillData();
                 //Delay to check functionality
                 await Task.Delay(1000);
                 IsRefreshing = false;
@@ -39,84 +39,79 @@ namespace GeneralApp.MVVM.ViewModels
             }
         }
 
-        private void Tasks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        [RelayCommand]
+        private void Appearing()
         {
-            UpdateData();
+            FillData();
+        }
+
+        [RelayCommand]
+        private async Task CheckedChanged(MyTask task)
+        {
+            if (task == null) return;
+
+            var categoryIndex = Categories.IndexOf(Categories.Where(x => x.Id == task.CategoryId).FirstOrDefault());
+
+            await App.TaskRepo.SaveItem(task);
+
+            var category = App.TaskCategoryRepo.GetItemWithChildren(task.CategoryId);
+            if (category.HasError) return;
+
+            int completedTasks = category.Result.MyTasks.Where(x => x.Completed).Count();
+            int pendingTasks = category.Result.MyTasks.Where(x => x.Completed == false).Count();
+
+            category.Result.PendingTasks = pendingTasks;
+            category.Result.Percentage = (float)completedTasks / (float)category.Result.MyTasks.Count;
+
+            await App.TaskCategoryRepo.SaveItem(category.Result);
+
+            Categories[categoryIndex] = category.Result;
         }
 
         private void FillData()
         {
-            Categories = new ObservableCollection<Category>
+            RefreshCategories();
+            RefreshTasks();
+        }
+
+        private void RefreshCategories()
+        {
+            var categories = App.TaskCategoryRepo.GetItemsWithChildren();
+
+            if (categories.HasError || categories.Result.Count == 0)
             {
-                new Category
-                {
-                    Id = 1,
-                    Name = "Study",
-                    Color = "#ff2b20"
-                },
-                new Category
-                {
-                    Id = 2,
-                    Name = "House",
-                    Color = "#e9c6b8"
-                },
-                new Category
-                {
-                    Id = 3,
-                    Name = "Relationship",
-                    Color = "#ff3fc7"
-                },
-                new Category
-                {
-                    Id = 4,
-                    Name = "Animals",
-                    Color = "#fcf500"
-                }
-            };
+                Categories = new();
+                return;
+            }
 
-            Tasks = new ObservableCollection<MyTask> {
-                new MyTask
-                {
-                    Id = 1,
-                    Name = "Study C#",
-                    Completed = true,
-                    CategoryId = 1,
-                },
-                new MyTask
-                {
-                    Id = 2,
-                    Name = "Clean the house",
-                    Completed = false,
-                    CategoryId = 2,
-                },
-                new MyTask
-                {
-                    Id = 3,
-                    Name = "Love my partner (Daily)",
-                    Completed = true,
-                    CategoryId = 3,
-                },
-                new MyTask
-                {
-                    Id = 4,
-                    Name = "Feed the cats",
-                    Completed = false,
-                    CategoryId = 4,
-                },
-                new MyTask
-                {
-                    Id = 5,
-                    Name = "Groceries",
-                    Completed = false,
-                    CategoryId = 2
-                }
-            };
+            Categories.Clear();
+            foreach (var category in categories.Result)
+            {
+                Categories.Add(category);
+            }
+        }
 
-            UpdateData();
+        private void RefreshTasks()
+        {
+            var tasks = App.TaskRepo.GetItemsWithChildren();
+
+            if (tasks.HasError || tasks.Result.Count == 0)
+            {
+                Tasks = new();
+                return;
+            }
+
+            Tasks.Clear();
+            foreach (var task in tasks.Result)
+            {
+                Tasks.Add(task);
+            }
         }
 
         public void UpdateData()
         {
+            Tasks.Clear();
+            Categories.Clear();
             foreach (var category in Categories)
             {
                 var tasks = Tasks.Where(t => t.CategoryId == category.Id);

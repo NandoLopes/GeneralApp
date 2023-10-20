@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using GeneralApp.Interfaces;
+using GeneralApp.Abstractions.Interfaces;
 using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.Views.ColorPicker;
 using GeneralApp.MVVM.Views.TaskManager;

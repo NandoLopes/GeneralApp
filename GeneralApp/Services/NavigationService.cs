@@ -1,4 +1,4 @@
-﻿using GeneralApp.Interfaces;
+﻿using GeneralApp.Abstractions.Interfaces;
 using GeneralApp.MVVM.ViewModels;
 using System.Diagnostics;
 

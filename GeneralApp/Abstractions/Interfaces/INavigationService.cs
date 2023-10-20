@@ -1,4 +1,4 @@
-﻿namespace GeneralApp.Interfaces
+﻿namespace GeneralApp.Abstractions.Interfaces
 {
     public interface INavigationService
     {

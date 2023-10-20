@@ -1,17 +1,21 @@
 using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.ViewModels.TaskManager;
+using GeneralApp.Services;
 
 namespace GeneralApp.MVVM.Views.TaskManager;
 
 public partial class NewTaskView : ContentPage
 {
     private readonly NewTaskViewModel _newTaskViewModel;
+    private readonly DialogService _dialogService;
 
-    public NewTaskView(NewTaskViewModel newTaskViewModel)
+    public NewTaskView(NewTaskViewModel newTaskViewModel,
+					   DialogService dialogService)
 	{
 		InitializeComponent();
         _newTaskViewModel = newTaskViewModel;
-		BindingContext = _newTaskViewModel;
+        _dialogService = dialogService;
+        BindingContext = _newTaskViewModel;
     }
 
     private async void AddTaskClicked(object sender, EventArgs e)
@@ -25,7 +29,6 @@ public partial class NewTaskView : ContentPage
             await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
         }
 		else if (selectedCategory == null)
-
         {
 			await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
 		}
@@ -33,12 +36,11 @@ public partial class NewTaskView : ContentPage
 		{
 			var task = new MyTask
 			{
-				Id = _newTaskViewModel.Tasks.Count + 1,
 				Name = _newTaskViewModel.NewTask,
 				CategoryId = selectedCategory.Id
 			};
 
-			_newTaskViewModel.Tasks.Add(task);
+			await _newTaskViewModel.AddTask(task, selectedCategory);
 			await Navigation.PopAsync();
 		}
 		else
@@ -55,20 +57,31 @@ public partial class NewTaskView : ContentPage
 			maxLength: 15,
 			keyboard: Keyboard.Text);
 
+		if (string.IsNullOrEmpty(category))
+		{
+            await DisplayAlert("Error", "The new Category needs a name!", "Ok");
+			return;
+		}
+
 		//TODO - Chose color.
 		var r = new Random();
 
-		if(!string.IsNullOrEmpty(category))
+		var result = await _newTaskViewModel.AddCategory(new TaskCategory
 		{
-			_newTaskViewModel.Categories.Add(new Category
-			{
-				Id = _newTaskViewModel.Categories.Count + 1,
-				Name = category,
-				Color = Color.FromRgb(
-					r.Next(0, 255),
-					r.Next(0, 255),
-					r.Next(0, 255)).ToHex()
-			});
+			Name = category,
+			Color = Color.FromRgb(
+				r.Next(0, 255),
+				r.Next(0, 255),
+				r.Next(0, 255)).ToHex()
+		});
+
+		if (result.HasError)
+        {
+			await DisplayAlert("Error", result.StatusMessage, "Ok");
+        }
+		else
+		{
+			await _dialogService.SnackbarSuccessAsync("Category created!");
 		}
     }
 }

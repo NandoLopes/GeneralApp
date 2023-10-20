@@ -1,4 +1,4 @@
-using GeneralApp.Interfaces;
+using GeneralApp.Abstractions.Interfaces;
 using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.ViewModels;
 using System.Collections.ObjectModel;
@@ -21,15 +21,10 @@ public partial class TaskerHomeView : ContentPage
         BindingContext = _taskerHomeViewModel;
     }
 
-    private void checkBox_CheckedChanged(object sender, EventArgs e)
-    {
-        _taskerHomeViewModel.UpdateData();
-    }
-
     private async void Button_Clicked(object sender, EventArgs e)
     {
         await _navigationService.NavigateToPage<NewTaskView>(
-                new Tuple<ObservableCollection<MyTask>, ObservableCollection<Category>>(_taskerHomeViewModel.Tasks, _taskerHomeViewModel.Categories)
+                new Tuple<ObservableCollection<MyTask>, ObservableCollection<TaskCategory>>(_taskerHomeViewModel.Tasks, _taskerHomeViewModel.Categories)
             );
     }
 }

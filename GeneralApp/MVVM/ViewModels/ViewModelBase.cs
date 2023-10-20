@@ -3,7 +3,7 @@
 namespace GeneralApp.MVVM.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
-    public partial class ViewModelBase : IQueryAttributable
+    public partial class ViewModelBase
     {
         public string Title { get; set; }
 
@@ -15,10 +15,5 @@ namespace GeneralApp.MVVM.ViewModels
 
         public virtual Task OnNavigatedTo()
             => Task.CompletedTask;
-
-        public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-
-        }
     }
 }
