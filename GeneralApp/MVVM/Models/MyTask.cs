@@ -23,7 +23,7 @@ namespace GeneralApp.MVVM.Models
 
         public DateTime? DueDate { get; set; }
 
-        [ManyToMany(typeof(TaskProduct),CascadeOperations = CascadeOperation.CascadeRead)]
-        public List<Product>? Products { get; set; }
+        [ManyToMany(typeof(TaskStock),CascadeOperations = CascadeOperation.CascadeRead)]
+        public List<StockItem>? Items { get; set; }
     }
 }

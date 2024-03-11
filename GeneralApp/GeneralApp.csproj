@@ -65,6 +65,12 @@
 	  <MauiXaml Update="MVVM\Views\Home\Home.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="MVVM\Views\Stock\NewItemView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="MVVM\Views\Stock\StockHomeView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="MVVM\Views\TaskManager\NewTaskView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

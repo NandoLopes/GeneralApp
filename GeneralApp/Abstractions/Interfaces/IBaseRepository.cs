@@ -8,7 +8,7 @@ namespace GeneralApp.Interfaces
         where T : TableData, new()
     {
         Task<GenericResponse<T>> SaveItem(T item);
-        GenericResponse<T> SaveItemWithChildren(T item, bool recursive = false);
+        Task<GenericResponse<T>> SaveItemWithChildren(T item, bool recursive = false);
         GenericResponse<T> GetItem(int id);
         GenericResponse<T> GetItemWithChildren(int id);
         GenericResponse<T> GetItem(Expression<Func<T, bool>> predicate);

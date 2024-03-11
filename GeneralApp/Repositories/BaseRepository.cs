@@ -136,7 +136,7 @@ namespace GeneralApp.Repositories
             }
         }
 
-        public GenericResponse<T> SaveItemWithChildren(T item, bool recursive = false)
+        public async Task<GenericResponse<T>> SaveItemWithChildren(T item, bool recursive = false)
         {
             connection.InsertWithChildren(item, recursive);
 

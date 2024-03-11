@@ -17,9 +17,9 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
             if (parameter == null)
                 return Task.CompletedTask;
 
-            if (parameter is Tuple<ObservableCollection<MyTask>, ObservableCollection<TaskCategory>>)
+            if (parameter is Tuple<ObservableCollection<MyTask>, ObservableCollection<TaskCategory>> newparameter)
             {
-                (Tasks, Categories) = parameter as Tuple<ObservableCollection<MyTask>, ObservableCollection<TaskCategory>>;
+                (Tasks, Categories) = newparameter;
             } else
             {
                 Categories = new();
@@ -48,7 +48,7 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
 
             var category = App.TaskCategoryRepo.GetItemWithChildren(task.CategoryId);
 
-            if (category.HasError) return new GenericResponse<MyTask> { HasError = true, StatusMessage = category.StatusMessage }; ;
+            if (category.HasError) return new GenericResponse<MyTask> { HasError = true, StatusMessage = category.StatusMessage };
 
             category.Result.PendingTasks += 1;
 

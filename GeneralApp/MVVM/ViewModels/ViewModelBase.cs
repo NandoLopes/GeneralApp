@@ -15,5 +15,7 @@ namespace GeneralApp.MVVM.ViewModels
 
         public virtual Task OnNavigatedTo()
             => Task.CompletedTask;
+
+        public bool IsRefreshing { get; set; }
     }
 }

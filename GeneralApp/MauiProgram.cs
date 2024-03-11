@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Maui;
 using GeneralApp.Abstractions.Interfaces;
-using GeneralApp.Interfaces;
 using GeneralApp.MVVM.Home;
 using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.ViewModels;
 using GeneralApp.MVVM.ViewModels.ColorPicker;
+using GeneralApp.MVVM.ViewModels.Stock;
 using GeneralApp.MVVM.ViewModels.TaskManager;
 using GeneralApp.MVVM.Views.ColorPicker;
+using GeneralApp.MVVM.Views.Stock;
 using GeneralApp.MVVM.Views.TaskManager;
 using GeneralApp.Repositories;
 using GeneralApp.Services;
@@ -59,6 +60,8 @@ public static class MauiProgram
         mauiAppBuilder.Services.AddSingleton<TaskerHomeViewModel>();
         mauiAppBuilder.Services.AddScoped<NewTaskViewModel>();
         mauiAppBuilder.Services.AddSingleton<ColorPickerViewModel>();
+        mauiAppBuilder.Services.AddSingleton<StockHomeViewModel>();
+        mauiAppBuilder.Services.AddScoped<NewItemViewModel>();
         return mauiAppBuilder;
     }
 
@@ -72,6 +75,8 @@ public static class MauiProgram
         mauiAppBuilder.Services.AddSingleton<TaskerHomeView>();
         mauiAppBuilder.Services.AddScoped<NewTaskView>();
         mauiAppBuilder.Services.AddSingleton<ColorPickerView>();
+        mauiAppBuilder.Services.AddSingleton<StockHomeView>();
+        mauiAppBuilder.Services.AddScoped<NewItemView>();
         return mauiAppBuilder;
     }
 
@@ -82,11 +87,10 @@ public static class MauiProgram
     public static MauiAppBuilder RegisterRepositories(this MauiAppBuilder mauiAppBuilder)
     {
         mauiAppBuilder.Services.AddSingleton<BaseRepository<MyTask>>();
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<Product>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<ProductCategory>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskCategory>>();
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskProduct>>();
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<Stock>>();
+        mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskStock>>();
+        mauiAppBuilder.Services.AddSingleton<BaseRepository<StockItem>>();
         return mauiAppBuilder;
     }
 

@@ -29,6 +29,7 @@
                             <RadioButton
                                 Content="{Binding Name}"
                                 GroupName="Category"
+                                TextColor="Black"
                                 IsChecked="{Binding IsSelected}"/>
                         </Frame>
                     </DataTemplate>

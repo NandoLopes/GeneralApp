@@ -5,10 +5,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!--#region AppColors -->
-    <Color x:Key="DarkBackground">#350066</Color>
+    <Color x:Key="DarkBackground">White</Color>
 
-    <Color x:Key="DarkMain">#6118a9</Color>
-    <Color x:Key="LightMain">#8034cc</Color>
+    <Color x:Key="DarkMain">Black</Color>
+    <Color x:Key="LightMain">LightGray</Color>
     
     <Color x:Key="DarkText">#E3E9EC</Color>
     <Color x:Key="LightText">#555A60</Color>

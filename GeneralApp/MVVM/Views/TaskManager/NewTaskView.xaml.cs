@@ -24,24 +24,34 @@ public partial class NewTaskView : ContentPage
 		var selectedCategory =
             _newTaskViewModel.Categories.Where(x => x.IsSelected == true).FirstOrDefault();
 
-		if (string.IsNullOrEmpty(_newTaskViewModel.NewTask))
-		{
-            await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
-        }
-		else if (selectedCategory == null)
+        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Trim()))
         {
-			await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
-		}
-		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask))
+            await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
+			return;
+        }
+
+        if (selectedCategory == null)
+        {
+            await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
+        }
+		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Trim()))
 		{
 			var task = new MyTask
 			{
-				Name = _newTaskViewModel.NewTask,
+				Name = _newTaskViewModel.NewTask.Trim(),
 				CategoryId = selectedCategory.Id
 			};
 
-			await _newTaskViewModel.AddTask(task, selectedCategory);
-			await Navigation.PopAsync();
+			var result = await _newTaskViewModel.AddTask(task, selectedCategory);
+
+            if (result.HasError)
+            {
+                await DisplayAlert("Error", result.StatusMessage, "Ok");
+                return;
+            }
+
+            await _dialogService.SnackbarSuccessAsync("Item saved!");
+            await Navigation.PopAsync();
 		}
 		else
 		{
@@ -57,7 +67,11 @@ public partial class NewTaskView : ContentPage
 			maxLength: 15,
 			keyboard: Keyboard.Text);
 
-		if (string.IsNullOrEmpty(category))
+		if (category == null)
+		{
+			return;
+		}
+		else if (string.IsNullOrEmpty(category.Trim()))
 		{
             await DisplayAlert("Error", "The new Category needs a name!", "Ok");
 			return;
@@ -68,7 +82,7 @@ public partial class NewTaskView : ContentPage
 
 		var result = await _newTaskViewModel.AddCategory(new TaskCategory
 		{
-			Name = category,
+			Name = category.Trim(),
 			Color = Color.FromRgb(
 				r.Next(0, 255),
 				r.Next(0, 255),

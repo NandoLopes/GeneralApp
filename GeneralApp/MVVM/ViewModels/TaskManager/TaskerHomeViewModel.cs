@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GeneralApp.Abstractions.Interfaces;
 using GeneralApp.MVVM.Models;
+using GeneralApp.MVVM.Views.Stock;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 
@@ -8,15 +10,17 @@ namespace GeneralApp.MVVM.ViewModels
     [AddINotifyPropertyChangedInterface]
     public partial class TaskerHomeViewModel : ViewModelBase
     {
-        public bool IsRefreshing { get; set; }
+        private readonly INavigationService _navigationService;
 
         public ObservableCollection<TaskCategory> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
-        public TaskerHomeViewModel()
+        public TaskerHomeViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
+            
             Categories = new();
             Tasks = new();
 
@@ -24,6 +28,7 @@ namespace GeneralApp.MVVM.ViewModels
         }
 
         private bool _canExecPullToRefreshCommand = true;
+
         private bool CanExecPullToRefreshCommand() => _canExecPullToRefreshCommand;
         private async Task ExecPullToRefreshCommand()
         {
@@ -31,7 +36,7 @@ namespace GeneralApp.MVVM.ViewModels
             {
                 _canExecPullToRefreshCommand = false;
 
-                FillData();
+                await FillData();
                 //Delay to check functionality
                 await Task.Delay(1000);
                 IsRefreshing = false;
@@ -40,16 +45,16 @@ namespace GeneralApp.MVVM.ViewModels
         }
 
         [RelayCommand]
-        private void Appearing()
+        private async Task Appearing()
         {
-            FillData();
+            await FillData();
         }
 
         [RelayCommand]
         private async Task CheckedChanged(MyTask task)
         {
             if (task == null) return;
-
+                
             var categoryIndex = Categories.IndexOf(Categories.Where(x => x.Id == task.CategoryId).FirstOrDefault());
 
             await App.TaskRepo.SaveItem(task);
@@ -68,10 +73,12 @@ namespace GeneralApp.MVVM.ViewModels
             Categories[categoryIndex] = category.Result;
         }
 
-        private void FillData()
+        private Task FillData()
         {
             RefreshCategories();
             RefreshTasks();
+
+            return Task.CompletedTask;
         }
 
         private void RefreshCategories()
@@ -108,24 +115,10 @@ namespace GeneralApp.MVVM.ViewModels
             }
         }
 
-        public void UpdateData()
+        [RelayCommand]
+        private async void Stock()
         {
-            Tasks.Clear();
-            Categories.Clear();
-            foreach (var category in Categories)
-            {
-                var tasks = Tasks.Where(t => t.CategoryId == category.Id);
-                var completed = tasks.Where(t => t.Completed == true);
-                var notCompleted = tasks.Where(t => t.Completed == false);
-
-                category.PendingTasks = notCompleted.Count();
-                category.Percentage = (float)completed.Count() / (float)tasks.Count();
-            }
-
-            foreach (var task in Tasks)
-            {
-                task.TaskColor = Categories.Where(x => x.Id == task.CategoryId).Select(c => c.Color).FirstOrDefault();
-            }
+            await _navigationService.NavigateToPage<StockHomeView>();
         }
     }
 }

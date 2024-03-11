@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GeneralApp.MVVM.Views.Stock.StockHomeView"
+             xmlns:converters="clr-namespace:GeneralApp.Shared.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="Stock" StyleClass="Header">
+
+    <ContentPage.Resources>
+        <converters:ColorConverter x:Key="ColorConverter"/>
+    </ContentPage.Resources>
+
+    <Grid Margin="15" RowDefinitions=".2*, .8*">
+        <Grid RowDefinitions=".2*, .8*">
+            <Label Text="CATEGORIES" StyleClass="SubHeader"/>
+            <Button CornerRadius="10" 
+                    Text="+" 
+                    Clicked="AddCategoryClicked"
+                    HorizontalOptions="End"
+                    HeightRequest="40"
+                    WidthRequest="40"/>
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" VerticalOptions="Start">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="5" Orientation="Horizontal"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10">
+                            <RoundRectangle/>
+                            <VerticalStackLayout Padding="15"
+                                                     Spacing="10">
+                                <Label Text="{Binding StockCount, StringFormat='{0} Items'}"/>
+                                <Label StyleClass="CardTitle"
+                                           Text="{Binding Name}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+        <Grid Grid.Row="1" RowDefinitions=".1*, .9*"
+              VerticalOptions="Start">
+            <Label StyleClass="SubHeader" Text="PRODUCTS" />
+            <Button CornerRadius="10" 
+                    Text="+"
+                    Clicked="AddProductClicked"
+                    HorizontalOptions="End"
+                    HeightRequest="40"
+                    WidthRequest="40"/>
+
+            <RefreshView Grid.Row="1"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                RefreshColor="{StaticResource Primary}"
+                IsRefreshing="{x:Binding IsRefreshing}"
+                Command="{x:Binding PullToRefreshCommand}">
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding StockItems}"
+                                x:Name="collectionView"
+                                ItemsUpdatingScrollMode="KeepLastItemInView">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame StyleClass="ListFrame">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Product}" VerticalOptions="Center" FontAttributes="Bold" FontSize="Medium"/>
+                                    <Label Text="{Binding Quantity, StringFormat='In stock: {0}'}"/>
+                                    <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d}'}"
+                                           IsVisible="{Binding Expires}"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </Grid>
+    </Grid>
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+</ContentPage>

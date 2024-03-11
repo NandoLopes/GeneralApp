@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="GeneralApp.MVVM.Views.Stock.NewItemView"
+             Title="New Product">
+    
+    <Grid RowDefinitions=".8*,.2*">
+        <VerticalStackLayout Padding="20,0,20,0"
+                         Spacing="10">
+            <Grid>
+                <RoundRectangle/>
+                <Picker x:Name="picker"
+                        Title="Select Category"
+                        Margin="10"
+                        ItemsSource="{Binding Categories}"
+                        ItemDisplayBinding="{Binding Name}"
+                        SelectedItem="{Binding NewStockItem.ProductCategory}"
+                        SelectedIndexChanged="Picker_SelectedIndexChanged">
+                    
+                    
+                </Picker>
+            </Grid>
+
+            <Grid>
+                <RoundRectangle/>
+                <Grid ColumnDefinitions="auto,*"
+                      Margin="10">
+                    <Label Text="Product Name:"
+                           VerticalOptions="Center"/>
+                    <Entry Grid.Column="1"
+                           Placeholder="Product Name"
+                           VerticalOptions="Center"
+                           PlaceholderColor="Gray"
+                           Text="{Binding NewStockItem.Product}"
+                           TextChanged="Entry_TextChanged"/>
+                </Grid>
+            </Grid>
+
+            <Grid>
+                <RoundRectangle/>
+                <Grid ColumnDefinitions="auto,*"
+                      Margin="10">
+                    <Label Text="In Stock:"
+                           VerticalOptions="Center"/>
+                    <Entry Grid.Column="1"
+                           Placeholder="0"
+                           VerticalOptions="Center"
+                           PlaceholderColor="Gray"
+                           Keyboard="Numeric"
+                           Text="{Binding Quantity}"
+                           TextChanged="Quantity_TextChanged"/>
+                </Grid>
+            </Grid>
+
+            <Grid>
+                <toolkit:Expander IsExpanded="{Binding Source={x:Reference dateCheckBox}, Path=IsChecked}">
+
+                    <toolkit:Expander.Header>
+                        <Grid ColumnDefinitions="auto,*">
+                            <RoundRectangle HorizontalOptions="CenterAndExpand" Grid.ColumnSpan="2"/>
+                            <Label Text="Expires"
+                                   VerticalOptions="Center"
+                                   Margin="10"/>
+                            <CheckBox Grid.Column="1"
+                                      HorizontalOptions="End"
+                                      Margin="10"
+                                      x:Name="dateCheckBox"
+                                      IsChecked="{Binding NewStockItem.Expires, Mode=TwoWay}"
+                                      CheckedChanged="DateCheckBox_CheckedChanged"/>
+                        </Grid>
+                    </toolkit:Expander.Header>
+
+                    <toolkit:Expander.Content>
+                        <Grid ColumnDefinitions="auto,*">
+                            <RoundRectangle HorizontalOptions="CenterAndExpand" Grid.ColumnSpan="2"/>
+                            
+                            <Label Text="Expiration Date (optional):"
+                                   VerticalOptions="Center"
+                                   Margin="10"/>
+                            <DatePicker Grid.Column="1"
+                                        VerticalOptions="Center"
+                                        Date="{Binding NewStockItem.ExpirationDate, Mode=TwoWay}"/>
+                        </Grid>
+                    </toolkit:Expander.Content>
+                </toolkit:Expander>
+            </Grid>
+        </VerticalStackLayout>
+
+        <Button Grid.Row="1"
+                BackgroundColor="#04AA6D"
+                VerticalOptions="CenterAndExpand"
+                Margin="20"
+                IsEnabled="False"
+                Text="Save"
+                Clicked="SaveItemClicked">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsValid}"
+                             Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
+                    <Setter Property="Opacity" Value="0.5"/>
+                </DataTrigger>
+
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsValid}"
+                             Value="True">
+                    <Setter Property="IsEnabled" Value="True"/>
+                    <Setter Property="Opacity" Value="1.0"/>
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+    </Grid>
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+</ContentPage>
