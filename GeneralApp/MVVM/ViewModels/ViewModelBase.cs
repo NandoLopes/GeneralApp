@@ -1,4 +1,5 @@
-﻿using PropertyChanged;
+﻿using GeneralApp.Abstractions.Interfaces;
+using PropertyChanged;
 
 namespace GeneralApp.MVVM.ViewModels
 {
@@ -17,5 +18,8 @@ namespace GeneralApp.MVVM.ViewModels
             => Task.CompletedTask;
 
         public bool IsRefreshing { get; set; }
+
+        public bool _canExecuteCommands { get; set; }
+        public bool CanExecuteCommands() { return _canExecuteCommands; }
     }
 }

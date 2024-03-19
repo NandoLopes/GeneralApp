@@ -1,5 +1,6 @@
 ﻿using GeneralApp.MVVM.Home;
 using GeneralApp.MVVM.Models;
+using GeneralApp.MVVM.Views.TaskManager;
 using GeneralApp.Repositories;
 
 namespace GeneralApp;
@@ -17,7 +18,7 @@ public partial class App : Application
                BaseRepository<ProductCategory> productCategoryRepo,
                BaseRepository<StockItem> stockRepo,
                BaseRepository<TaskStock> taskProductRepo,
-               Home home)
+               TaskerHomeView home)
     {
         InitializeComponent();
 
@@ -28,6 +29,6 @@ public partial class App : Application
         TaskProductRepo = taskProductRepo;
 
         MainPage = new NavigationPage(home);  //<--- Official
-                                              //MainPage = new NavigationPage(new NewTaskView());
+        //MainPage = new NavigationPage(new TaskerHomeView());
     }
 }

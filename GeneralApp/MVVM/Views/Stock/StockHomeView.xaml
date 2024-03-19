@@ -8,25 +8,77 @@
 
     <ContentPage.Resources>
         <converters:ColorConverter x:Key="ColorConverter"/>
+
+        <Style TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
     </ContentPage.Resources>
 
     <Grid Margin="15" RowDefinitions=".2*, .8*">
         <Grid RowDefinitions=".2*, .8*">
-            <Label Text="CATEGORIES" StyleClass="SubHeader"/>
-            <Button CornerRadius="10" 
-                    Text="+" 
-                    Clicked="AddCategoryClicked"
-                    HorizontalOptions="End"
-                    HeightRequest="40"
-                    WidthRequest="40"/>
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" VerticalOptions="Start">
+            <Grid>
+                <Label Text="CATEGORIES"
+                       StyleClass="SubHeader"
+                       HeightRequest="40"
+                       VerticalTextAlignment="Center"
+                       VerticalOptions="Center"/>
+                <Button IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
+                        CornerRadius="10"
+                        Text="+" 
+                        Clicked="AddCategoryClicked"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10" 
+                        Text="x"
+                        Command="{Binding ClearCategorySelectionCommand}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+            </Grid>
+            <CollectionView Grid.Row="1" 
+                            ItemsSource="{Binding Categories}"
+                            SelectionMode="Multiple"
+                            SelectedItems="{Binding SelectedCategories}"
+                            SelectionChangedCommand="{Binding CategorySelectionChangedCommand}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="5" Orientation="Horizontal"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="10">
-                            <RoundRectangle/>
+                            <RoundRectangle>
+                                <RoundRectangle.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="RoundRectangle"
+                                                 Value="true">
+                                        <Setter Property="Fill"
+                                                Value="Gray"/>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="RoundRectangle"
+                                                 Value="false">
+                                        <Setter Property="Fill"
+                                                Value="LightGray"/>
+                                    </DataTrigger>
+                                </RoundRectangle.Triggers>
+                            </RoundRectangle>
                             <VerticalStackLayout Padding="15"
                                                      Spacing="10">
                                 <Label Text="{Binding StockCount, StringFormat='{0} Items'}"/>
@@ -38,41 +90,56 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-        <Grid Grid.Row="1" RowDefinitions=".1*, .9*"
-              VerticalOptions="Start">
-            <Label StyleClass="SubHeader" Text="PRODUCTS" />
-            <Button CornerRadius="10" 
+        <Frame Grid.Row="1" BackgroundColor="#eaeaea"
+               Margin="0,10,0,0"
+               Padding="0"
+               HorizontalOptions="Center">
+            <Grid RowDefinitions=".1*, .9*"
+                  HorizontalOptions="CenterAndExpand">
+                <Grid BackgroundColor="#bcbdbd"
+                      HorizontalOptions="FillAndExpand"
+                      Padding="10,5,10,5">
+                    <Label StyleClass="SubHeader" 
+                           Text="PRODUCTS"
+                           VerticalTextAlignment="Center"/>
+                </Grid>
+                
+                <Button CornerRadius="10" 
                     Text="+"
                     Clicked="AddProductClicked"
                     HorizontalOptions="End"
                     HeightRequest="40"
                     WidthRequest="40"/>
 
-            <RefreshView Grid.Row="1"
-                VerticalOptions="FillAndExpand"
-                HorizontalOptions="FillAndExpand"
-                RefreshColor="{StaticResource Primary}"
-                IsRefreshing="{x:Binding IsRefreshing}"
-                Command="{x:Binding PullToRefreshCommand}">
+                <RefreshView Grid.Row="1"
+                             VerticalOptions="FillAndExpand"
+                             HorizontalOptions="FillAndExpand"
+                             RefreshColor="Gray"
+                             IsRefreshing="{x:Binding IsRefreshing}"
+                             Command="{x:Binding PullToRefreshCommand}"
+                             Margin="10,5,10,5">
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding StockItems}"
-                                x:Name="collectionView"
-                                ItemsUpdatingScrollMode="KeepLastItemInView">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Frame StyleClass="ListFrame">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding Product}" VerticalOptions="Center" FontAttributes="Bold" FontSize="Medium"/>
-                                    <Label Text="{Binding Quantity, StringFormat='In stock: {0}'}"/>
-                                    <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d}'}"
+                    <CollectionView ItemsSource="{Binding StockItems}"
+                                    x:Name="collectionView"
+                                    ItemsUpdatingScrollMode="KeepLastItemInView"
+                                    HorizontalOptions="Center">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame StyleClass="ListFrame"
+                                       Margin="0,5,0,5">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Product}" VerticalOptions="Center" FontAttributes="Bold" FontSize="Medium"/>
+                                        <Label Text="{Binding Quantity, StringFormat='In stock: {0}'}"/>
+                                        <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d}'}"
                                            IsVisible="{Binding Expires}"/>
-                                </VerticalStackLayout>
-                            </Frame>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
-        </Grid>
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+            </Grid>
+        </Frame>
     </Grid>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />

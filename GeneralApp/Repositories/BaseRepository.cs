@@ -174,5 +174,19 @@ namespace GeneralApp.Repositories
                 return Helpers.ErrorResponse<List<T>>(ex.Message);
             }
         }
+
+        public GenericResponse<List<T>> GetItemsWithChildrenPredicate(Func<T, bool> predicate)
+        {
+            try
+            {
+                var result = connection.GetAllWithChildren<T>().Where(predicate).ToList();
+
+                return new GenericResponse<List<T>> { Result = result };
+            }
+            catch (Exception ex)
+            {
+                return Helpers.ErrorResponse<List<T>>(ex.Message);
+            }
+        }
     }
 }

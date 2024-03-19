@@ -17,6 +17,9 @@ namespace GeneralApp.MVVM.Models
         public List<StockItem>? StockItems { get; set; }
 
         [Ignore]
+        public bool IsSelected { get; set; }
+
+        [Ignore]
         public int StockCount {
             get { return (StockItems != null ? StockItems.Count : 0); }
         }

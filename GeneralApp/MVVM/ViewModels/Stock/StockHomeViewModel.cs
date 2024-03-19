@@ -8,13 +8,17 @@ namespace GeneralApp.MVVM.ViewModels.Stock
     public partial class StockHomeViewModel : ViewModelBase
     {
         public ObservableCollection<ProductCategory> Categories { get; set; }
+        public ObservableCollection<object> SelectedCategories { get; set; } //.NET MAUI bug won't update SelectedItems if not in an "object" type list.
         public ObservableCollection<StockItem> StockItems { get; set; }
+
+        public bool VisibleClearCategory { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
         public StockHomeViewModel()
         {
             Categories = new();
+            SelectedCategories = new();
             StockItems = new();
 
             PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
@@ -38,12 +42,50 @@ namespace GeneralApp.MVVM.ViewModels.Stock
         [RelayCommand]
         private void Appearing()
         {
+            _canExecuteCommands = false;
+
+            SelectedCategories = new();
+            VisibleClearCategory = false;
             FillData();
+
+            _canExecuteCommands = true;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanExecuteCommands))]
+        private void CategorySelectionChanged()
+        {
+            _canExecuteCommands = false;
+
+            VisibleClearCategory = SelectedCategories.Any();
+            UpdateCategorySelection();
+            RefreshStock();
+
+            _canExecuteCommands = true;
+        }
+
+        [RelayCommand]
+        private async void ClearCategorySelection()
+        {
+            try
+            {
+                _canExecuteCommands = false;
+
+                SelectedCategories.Clear();
+                VisibleClearCategory = false;
+                await FillData();
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
         }
 
         private Task FillData()
         {
             RefreshCategories();
+            SelectedCategories.Clear();
+            VisibleClearCategory = false;
+            UpdateCategorySelection();
             RefreshStock();
 
             return Task.CompletedTask;
@@ -51,6 +93,8 @@ namespace GeneralApp.MVVM.ViewModels.Stock
 
         private void RefreshCategories()
         {
+            _canExecuteCommands = false;
+
             var categories = App.ProductCategoryRepo.GetItemsWithChildren();
 
             if (categories.HasError || categories.Result.Count == 0)
@@ -64,23 +108,41 @@ namespace GeneralApp.MVVM.ViewModels.Stock
             {
                 Categories.Add(category);
             }
+
+            _canExecuteCommands = true;
         }
 
         private void RefreshStock()
         {
-            var stock = App.StockRepo.GetItemsWithChildren();
+            _canExecuteCommands = false;
 
-            if (stock.HasError || stock.Result.Count == 0)
+            var selectedCategories = SelectedCategories.Cast<ProductCategory>().ToList();
+            var items = App.StockRepo.GetItemsWithChildrenPredicate(x => selectedCategories.Any(y => y.Id == x.ProductCategory.Id) || selectedCategories.Count == 0);
+
+            if (items.HasError || items.Result.Count == 0)
             {
                 StockItems = new();
-                return;
             }
 
             StockItems.Clear();
-            foreach (var item in stock.Result)
+            foreach (var item in items.Result)
             {
                 StockItems.Add(item);
             }
+
+            _canExecuteCommands = true;
+        }
+
+        private void UpdateCategorySelection()
+        {
+            _canExecuteCommands = false;
+
+            foreach (var category in Categories)
+            {
+                category.IsSelected = SelectedCategories.Cast<ProductCategory>().Any(y => y.Id == category.Id);
+            }
+
+            _canExecuteCommands = true;
         }
 
         public async Task<GenericResponse<ProductCategory>> AddCategory(ProductCategory newCategory)

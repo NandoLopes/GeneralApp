@@ -8,19 +8,69 @@
 
     <ContentPage.Resources>
         <converters:ColorConverter x:Key="ColorConverter"/>
+
+        <Style TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
     </ContentPage.Resources>
 
-    <Grid Margin="15" RowDefinitions=".3*, .8*">
+    <Grid Margin="15" RowDefinitions=".2*, .7*, .1*">
         <Grid RowDefinitions=".2*, .8*">
-            <Label Text="CATEGORIES" StyleClass="SubHeader"/>
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}">
+            <Grid>
+                <Label Text="CATEGORIES"
+                       StyleClass="SubHeader"
+                       HeightRequest="40"
+                       VerticalTextAlignment="Center"
+                       VerticalOptions="Center"/>
+                <Button IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10" 
+                        Text="x"
+                        Command="{Binding ClearCategorySelectionCommand}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+            </Grid>
+            <CollectionView Grid.Row="1" 
+                            ItemsSource="{Binding Categories}"
+                            SelectionMode="Multiple"
+                            SelectedItems="{Binding SelectedCategories}"
+                            SelectionChangedCommand="{Binding CategorySelectionChangedCommand}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="5" Orientation="Horizontal"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="10">
-                            <RoundRectangle/>
+                            <RoundRectangle>
+                                <RoundRectangle.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="RoundRectangle"
+                                                 Value="true">
+                                        <Setter Property="Fill"
+                                                Value="Gray"/>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="RoundRectangle"
+                                                 Value="false">
+                                        <Setter Property="Fill"
+                                                Value="LightGray"/>
+                                    </DataTrigger>
+                                </RoundRectangle.Triggers>
+                            </RoundRectangle>
                             <VerticalStackLayout Padding="15" 
                                                  Spacing="10">
                                 <Label Text="{Binding PendingTasks, StringFormat='{0} Tasks'}"/>
@@ -33,64 +83,87 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-        <Grid Grid.Row="1" RowDefinitions=".1*, .9*">
-            <Label StyleClass="SubHeader" Text="PENDING TASKS"/>
+        <Frame Grid.Row="1" BackgroundColor="#eaeaea"
+               Margin="0,10,0,0"
+               Padding="0"
+               HorizontalOptions="Center">
+            <Grid RowDefinitions=".1*, .9*" 
+                  HorizontalOptions="CenterAndExpand">
+                <Grid BackgroundColor="#bcbdbd"
+                      VerticalOptions="FillAndExpand"
+                      HorizontalOptions="FillAndExpand"
+                      Padding="10,5,10,5">
+                    <Label StyleClass="SubHeader" 
+                           Text="PENDING TASKS"
+                           VerticalTextAlignment="Center"/>
+                </Grid>
 
-            <RefreshView Grid.Row="1"
-                VerticalOptions="FillAndExpand"
+                <RefreshView Grid.Row="1"
+                             VerticalOptions="FillAndExpand"
+                             HorizontalOptions="FillAndExpand"
+                             RefreshColor="Gray"
+                             IsRefreshing="{x:Binding IsRefreshing}"
+                             Command="{x:Binding PullToRefreshCommand}"
+                             Margin="10,5,10,5">
+
+                    <CollectionView ItemsSource="{Binding Tasks}"
+                                    x:Name="collectionView"
+                                    ItemsUpdatingScrollMode="KeepLastItemInView"
+                                    HorizontalOptions="Center">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame StyleClass="ListFrame"
+                                       Margin="0,5,0,5">
+                                    <HorizontalStackLayout>
+                                        <CheckBox 
+                                        x:Name="checkBox"
+                                        IsChecked="{Binding Completed}"
+                                        VerticalOptions="Center"
+                                        Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
+                                            <CheckBox.Behaviors>
+                                                <toolkit:EventToCommandBehavior EventName="CheckedChanged"
+                                                    Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.CheckedChangedCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </CheckBox.Behaviors>
+                                        </CheckBox>
+                                        
+                                        <Label Text="{Binding Name}" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
+                                                TargetType="Label"
+                                                Value="True">
+                                                    <Setter Property="TextDecorations"
+                                                        Value="Strikethrough"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+            </Grid>
+        </Frame>
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*"
+              Padding="0"
+              ColumnSpacing="10">
+            <Button
                 HorizontalOptions="FillAndExpand"
-                RefreshColor="{StaticResource Primary}"
-                IsRefreshing="{x:Binding IsRefreshing}"
-                Command="{x:Binding PullToRefreshCommand}">
-
-                <CollectionView Grid.Row="1" ItemsSource="{Binding Tasks}"
-                                x:Name="collectionView"
-                                ItemsUpdatingScrollMode="KeepLastItemInView">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Frame StyleClass="ListFrame">
-                                <HorizontalStackLayout>
-                                    <CheckBox 
-                                    x:Name="checkBox"
-                                    IsChecked="{Binding Completed}"
-                                    VerticalOptions="Center"
-                                    Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
-                                        <CheckBox.Behaviors>
-                                            <toolkit:EventToCommandBehavior EventName="CheckedChanged"
-                                                Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.CheckedChangedCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                        </CheckBox.Behaviors>
-                                    </CheckBox>
-                                    
-                                    <Label Text="{Binding Name}" VerticalOptions="Center">
-                                        <Label.Triggers>
-                                            <DataTrigger
-                                            Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
-                                            TargetType="Label"
-                                            Value="True">
-                                                <Setter Property="TextDecorations"
-                                                    Value="Strikethrough"/>
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </HorizontalStackLayout>
-                            </Frame>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
+                BackgroundColor="DarkGray"
+                Command="{Binding StockCommand}"
+                Text="Stock"
+                Margin="0,10,0,10"/>
+            <Button
+                Grid.Column="1"
+                Clicked="Button_Clicked"
+                BackgroundColor="DarkGray"
+                HorizontalOptions="FillAndExpand"
+                Text="Add Task"
+                Margin="0,10,0,10"/>
         </Grid>
-        <Button
-            Grid.Row="1"
-            Clicked="Button_Clicked"
-            Style="{StaticResource CircularButton}"
-            Text="+"/>
-        <Button
-            Grid.Row="1"
-            HorizontalOptions="Start"
-            Command="{Binding StockCommand}"
-            Style="{StaticResource CircularButton}"
-            Text="S"/>
     </Grid>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />
