@@ -20,11 +20,12 @@ public partial class NewTaskView : ContentPage
 
     private async void AddTaskClicked(object sender, EventArgs e)
     {
-		//TODO - Remove "IsSelected" property.
-		var selectedCategory =
-            _newTaskViewModel.Categories.Where(x => x.IsSelected == true).FirstOrDefault();
+		//Updated old category if edit
 
-        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Trim()))
+		var selectedCategory =
+			_newTaskViewModel.SelectedCategory;
+
+        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name.Trim()))
         {
             await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
 			return;
@@ -34,15 +35,11 @@ public partial class NewTaskView : ContentPage
         {
             await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
         }
-		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Trim()))
+		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name.Trim()))
 		{
-			var task = new MyTask
-			{
-				Name = _newTaskViewModel.NewTask.Trim(),
-				CategoryId = selectedCategory.Id
-			};
+            _newTaskViewModel.NewTask.Name = _newTaskViewModel.NewTask.Name.Trim();
 
-			var result = await _newTaskViewModel.AddTask(task, selectedCategory);
+			var result = await _newTaskViewModel.AddTask();
 
             if (result.HasError)
             {

@@ -24,7 +24,36 @@
                 </VisualStateGroupList>
             </Setter>
         </Style>
+
+        <Style TargetType="Border">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
     </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+        StyleId="Item1"
+        Order="Secondary"
+        Text="Item 1"
+        />
+        <ToolbarItem
+        StyleId="Item2"
+        Order="Secondary"
+        Text="Item 2"
+        />
+    </ContentPage.ToolbarItems>
 
     <Grid Margin="15" RowDefinitions=".2*, .7*, .1*">
         <Grid RowDefinitions=".2*, .8*">
@@ -36,7 +65,7 @@
                        VerticalOptions="Center"/>
                 <Button IsVisible="{Binding VisibleClearCategory}"
                         CornerRadius="10" 
-                        Text="x"
+                        Text="X"
                         Command="{Binding ClearCategorySelectionCommand}"
                         HorizontalOptions="End"
                         VerticalOptions="Center"
@@ -89,13 +118,55 @@
                HorizontalOptions="Center">
             <Grid RowDefinitions=".1*, .9*" 
                   HorizontalOptions="CenterAndExpand">
-                <Grid BackgroundColor="#bcbdbd"
+                <Grid ColumnDefinitions="*, auto, auto, auto"
+                      BackgroundColor="#bcbdbd"
                       VerticalOptions="FillAndExpand"
-                      HorizontalOptions="FillAndExpand"
-                      Padding="10,5,10,5">
-                    <Label StyleClass="SubHeader" 
+                      HorizontalOptions="FillAndExpand">
+                    <Label Margin="10,5"
                            Text="PENDING TASKS"
-                           VerticalTextAlignment="Center"/>
+                           StyleClass="SubHeader"
+                           HeightRequest="40"
+                           VerticalTextAlignment="Center"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="3"
+                            Margin="10,0"
+                            BorderWidth="3"
+                            BorderColor="DarkGray"
+                            IsVisible="{Binding VisibleClearTask}"
+                            CornerRadius="10"
+                            Text="X"
+                            Command="{Binding ClearTaskSelectionCommand}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
+                    <Button Grid.Column="2"
+                            BorderColor="#E63940"
+                            TextColor="#E63940"
+                            BorderWidth="3"
+                            Margin="10,0"
+                            IsVisible="{Binding VisibleClearTask}"
+                            CornerRadius="10"
+                            Text="X"
+                            Clicked="DeleteTasks"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
+                    <Button Grid.Column="1"
+                            BorderColor="#5bc0de"
+                            TextColor="#5bc0de"
+                            BorderWidth="3"
+                            Margin="10,0"
+                            IsVisible="{Binding VisibleEditTask}"
+                            CornerRadius="10"
+                            Text="E"
+                            Command="{Binding TaskEditCommand}"
+                            CommandParameter="edit"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
                 </Grid>
 
                 <RefreshView Grid.Row="1"
@@ -109,37 +180,58 @@
                     <CollectionView ItemsSource="{Binding Tasks}"
                                     x:Name="collectionView"
                                     ItemsUpdatingScrollMode="KeepLastItemInView"
-                                    HorizontalOptions="Center">
+                                    HorizontalOptions="Center"
+                                    SelectionMode="Multiple"
+                                    SelectedItems="{Binding SelectedTasks}"
+                                    SelectionChangedCommand="{Binding TaskSelectionChangedCommand}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame StyleClass="ListFrame"
-                                       Margin="0,5,0,5">
-                                    <HorizontalStackLayout>
-                                        <CheckBox 
-                                        x:Name="checkBox"
-                                        IsChecked="{Binding Completed}"
-                                        VerticalOptions="Center"
-                                        Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
+                                <Border Margin="0,5,0,5">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="true">
+                                            <Setter Property="BackgroundColor"
+                                                Value="Gray"/>
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="false">
+                                            <Setter Property="BackgroundColor"
+                                                Value="LightGray"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+
+                                    <HorizontalStackLayout Margin="10">
+                                        <CheckBox x:Name="checkBox"
+                                                  Scale="1.5"
+                                                  IsChecked="{Binding Completed}"
+                                                  VerticalOptions="Center"
+                                                  Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
                                             <CheckBox.Behaviors>
                                                 <toolkit:EventToCommandBehavior EventName="CheckedChanged"
                                                     Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.CheckedChangedCommand}"
                                                     CommandParameter="{Binding .}"/>
                                             </CheckBox.Behaviors>
                                         </CheckBox>
-                                        
+
                                         <Label Text="{Binding Name}" VerticalOptions="Center">
                                             <Label.Triggers>
-                                                <DataTrigger
-                                                Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
-                                                TargetType="Label"
-                                                Value="True">
+                                                <DataTrigger Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
+                                                             TargetType="Label"
+                                                             Value="True">
                                                     <Setter Property="TextDecorations"
                                                         Value="Strikethrough"/>
                                                 </DataTrigger>
                                             </Label.Triggers>
                                         </Label>
                                     </HorizontalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -158,9 +250,10 @@
                 Margin="0,10,0,10"/>
             <Button
                 Grid.Column="1"
-                Clicked="Button_Clicked"
-                BackgroundColor="DarkGray"
                 HorizontalOptions="FillAndExpand"
+                BackgroundColor="DarkGray"
+                Command="{Binding TaskEditCommand}"
+                CommandParameter=""
                 Text="Add Task"
                 Margin="0,10,0,10"/>
         </Grid>

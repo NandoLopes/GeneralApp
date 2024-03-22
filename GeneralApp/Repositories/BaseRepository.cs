@@ -12,7 +12,7 @@ namespace GeneralApp.Repositories
     public class BaseRepository<T> : IBaseRepository<T>
         where T : TableData, new()
     {
-        SQLiteConnection connection;
+        readonly SQLiteConnection connection;
 
         public BaseRepository()
         {

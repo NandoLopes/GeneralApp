@@ -5,7 +5,7 @@ namespace GeneralApp.Services
 {
     public class DialogService
     {
-        private readonly int SecondsDurationSnackBar = 10;
+        private readonly int SecondsDurationSnackBar = 5;
 
         private readonly SnackbarOptions snackbarOptionsError;
 

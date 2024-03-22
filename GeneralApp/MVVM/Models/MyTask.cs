@@ -25,5 +25,8 @@ namespace GeneralApp.MVVM.Models
 
         [ManyToMany(typeof(TaskStock),CascadeOperations = CascadeOperation.CascadeRead)]
         public List<StockItem>? Items { get; set; }
+
+        [Ignore]
+        public bool IsSelected { get; set; }
     }
 }

@@ -84,7 +84,7 @@
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource LightMain},
                                         Dark={StaticResource LightMain}}"/>
-        <Setter Property="WidthRequest" Value="200"/>
+        <Setter Property="MinimumWidthRequest" Value="200"/>
         <Setter Property="Shadow" Value="{StaticResource shadow}"/>
     </Style>
 

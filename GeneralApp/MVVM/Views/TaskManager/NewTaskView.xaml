@@ -2,36 +2,71 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GeneralApp.MVVM.Views.TaskManager.NewTaskView"
-             Title="Add new Task">
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="{Binding Title}">
+    
+    <ContentPage.Resources>
+        <Style TargetType="Border">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
 
     <Grid RowDefinitions=".2*, .7*, .1*">
         <Entry Placeholder="Enter New Task"
-               Text="{Binding NewTask}"
+               Text="{Binding NewTask.Name}"
                Style="{StaticResource Task}"/>
 
         <Grid Grid.Row="1">
-            <CollectionView
-                Grid.Row="1"
-                Margin="15"
-                ItemsSource="{Binding Categories}"
-                SelectedItem="{Binding SelectedCategory}"
-                SelectionMode="Single">
+            <CollectionView Grid.Row="1"
+                            Margin="15"
+                            ItemsSource="{Binding Categories}"
+                            SelectedItem="{Binding SelectedCategory}"
+                            SelectionMode="Single"
+                            SelectionChangedCommand="{Binding CategorySelectionChangedCommand}">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout
-                        HorizontalItemSpacing="5"
-                        VerticalItemSpacing="5"
-                        Orientation="Vertical"
-                        Span="2"/>
+                    <GridItemsLayout HorizontalItemSpacing="5"
+                                     VerticalItemSpacing="5"
+                                     Orientation="Vertical"
+                                     Span="2"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame StyleClass="ListFrame">
-                            <RadioButton
-                                Content="{Binding Name}"
-                                GroupName="Category"
-                                TextColor="Black"
-                                IsChecked="{Binding IsSelected}"/>
-                        </Frame>
+                        <Border Padding="10,10,10,10">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+
+                            <Border.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="true">
+                                    <Setter Property="BackgroundColor"
+                                            Value="Gray"/>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="Border"
+                                             Value="false">
+                                    <Setter Property="BackgroundColor"
+                                            Value="LightGray"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            
+                            <Label Text="{Binding Name}"
+                                   TextColor="Black"/>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -43,9 +78,12 @@
             Spacing="15"
             VerticalOptions="Center"
             Padding="-20">
-            <Button CornerRadius="15" Text="Add Task" Clicked="AddTaskClicked"/>
+            <Button CornerRadius="15" Text="Save Task" Clicked="AddTaskClicked"/>
             <Button CornerRadius="15" Text="Add Category" Clicked="AddCategoryClicked"/>
         </HorizontalStackLayout>
     </Grid>
-    
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
 </ContentPage>

@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using GeneralApp.Abstractions.Interfaces;
 using GeneralApp.MVVM.Models;
+using GeneralApp.MVVM.Models.Helpers;
 using GeneralApp.MVVM.Views.Stock;
+using GeneralApp.MVVM.Views.TaskManager;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 
@@ -13,19 +15,23 @@ namespace GeneralApp.MVVM.ViewModels
         private readonly INavigationService _navigationService;
 
         public ObservableCollection<TaskCategory> Categories { get; set; }
-        public ObservableCollection<object> SelectedCategories { get; set; } //.NET MAUI bug won't update SelectedItems if not in an "object" type list.
         public ObservableCollection<MyTask> Tasks { get; set; }
+        public ObservableCollection<object> SelectedCategories { get; set; } //.NET MAUI bug won't update SelectedItems if not in an "object" type list.
+        public ObservableCollection<object> SelectedTasks { get; set; } //.NET MAUI bug won't update SelectedItems if not in an "object" type list.
 
         public bool VisibleClearCategory { get; set; }
+        public bool VisibleClearTask { get; set; }
+        public bool VisibleEditTask { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
         public TaskerHomeViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
-            
+
             Categories = new();
             SelectedCategories = new();
+            SelectedTasks = new();
             Tasks = new();
 
             PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
@@ -41,8 +47,6 @@ namespace GeneralApp.MVVM.ViewModels
                 _canExecPullToRefreshCommand = false;
 
                 await FillData();
-                //Delay to check functionality
-                await Task.Delay(1000);
                 IsRefreshing = false;
                 _canExecPullToRefreshCommand = true;
             }
@@ -54,7 +58,10 @@ namespace GeneralApp.MVVM.ViewModels
             _canExecuteCommands = false;
 
             SelectedCategories = new();
+            SelectedTasks = new();
             VisibleClearCategory = false;
+            VisibleClearTask = false;
+            VisibleEditTask = false;
             await FillData();
 
             _canExecuteCommands = true;
@@ -63,13 +70,32 @@ namespace GeneralApp.MVVM.ViewModels
         [RelayCommand(CanExecute = nameof(CanExecuteCommands))]
         private void CategorySelectionChanged()
         {
-            _canExecuteCommands = false;
+            try
+            {
+                _canExecuteCommands = false;
 
-            VisibleClearCategory = SelectedCategories.Any();
-            UpdateCategorySelection();
-            RefreshTasks();
+                ClearTaskSelection();
+                UpdateCategorySelection();
+                RefreshTasks();
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
+        }
 
-            _canExecuteCommands = true;
+        [RelayCommand(CanExecute = nameof(CanExecuteCommands))]
+        private void TaskSelectionChanged()
+        {
+            try
+            {
+                _canExecuteCommands = false;
+                UpdateTaskSelection();
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
         }
 
         [RelayCommand(CanExecute = nameof(CanExecuteCommands))]
@@ -85,8 +111,8 @@ namespace GeneralApp.MVVM.ViewModels
                     return;
                 }
 
-              /*Next two lines added because MAUI will trigger the command with a task existing in the list,
-                but with the Completed flag inverted. CanExecute on the command didn't stopped this from triggering. */
+                /*Next two lines added because MAUI will trigger the command with a task existing in the list,
+                  but with the Completed flag inverted. CanExecute on the command didn't stopped this from triggering. */
                 var existingTask = Tasks.FirstOrDefault(x => x.Id == task.Id);
                 if (existingTask != null && task.Completed != existingTask.Completed)
                 {
@@ -134,9 +160,24 @@ namespace GeneralApp.MVVM.ViewModels
                 _canExecuteCommands = false;
 
                 SelectedCategories.Clear();
-                VisibleClearCategory = false;
                 await FillData();
-            } 
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
+        }
+
+        [RelayCommand]
+        private void ClearTaskSelection()
+        {
+            try
+            {
+                _canExecuteCommands = false;
+
+                SelectedTasks.Clear();
+                UpdateTaskSelection();
+            }
             finally
             {
                 _canExecuteCommands = true;
@@ -149,6 +190,7 @@ namespace GeneralApp.MVVM.ViewModels
             SelectedCategories.Clear();
             VisibleClearCategory = false;
             UpdateCategorySelection();
+            SelectedTasks.Clear();
             RefreshTasks();
 
             return Task.CompletedTask;
@@ -156,55 +198,153 @@ namespace GeneralApp.MVVM.ViewModels
 
         private void RefreshCategories()
         {
-            _canExecuteCommands = false;
-
-            var categories = App.TaskCategoryRepo.GetItemsWithChildren();
-
-            if (categories.HasError || categories.Result.Count == 0)
+            try
             {
-                Categories = new();
-            }
+                _canExecuteCommands = false;
 
-            Categories.Clear();
-            foreach (var category in categories.Result)
+                var categories = App.TaskCategoryRepo.GetItemsWithChildren();
+
+                if (categories.HasError || categories.Result.Count == 0)
+                {
+                    Categories = new();
+                    return;
+                }
+
+                Categories.Clear();
+                foreach (var category in categories.Result)
+                {
+                    Categories.Add(category);
+                }
+            }
+            finally
             {
-                Categories.Add(category);
+                _canExecuteCommands = true;
             }
-
-            _canExecuteCommands = true;
         }
 
-        private void RefreshTasks()
+        public void RefreshTasks()
         {
-            _canExecuteCommands = false;
-
-            var selectedCategories = SelectedCategories.Cast<TaskCategory>().ToList();
-            var tasks = App.TaskRepo.GetItemsWithChildrenPredicate(x => selectedCategories.Any(y => y.Id == x.Category.Id) || selectedCategories.Count == 0);
-
-            if (tasks.HasError || tasks.Result.Count == 0)
+            try
             {
-                Tasks = new();
-            }
+                _canExecuteCommands = false;
 
-            Tasks.Clear();
-            foreach (var task in tasks.Result)
+                var selectedCategories = SelectedCategories.Cast<TaskCategory>().ToList();
+
+                var it = App.TaskRepo.GetItemsWithChildrenPredicate(x => true);
+
+                var tasks = App.TaskRepo.GetItemsWithChildrenPredicate(x => selectedCategories.Any(y => y.Id == x.CategoryId) || selectedCategories.Count == 0);
+
+                if (tasks.HasError || tasks.Result.Count == 0)
+                {
+                    Tasks = new();
+                    return;
+                }
+
+                Tasks.Clear();
+                foreach (var task in tasks.Result)
+                {
+                    Tasks.Add(task);
+                }
+            }
+            finally
             {
-                Tasks.Add(task);
+                UpdateTaskSelection();
+                _canExecuteCommands = true;
             }
-
-            _canExecuteCommands = true;
         }
 
         private void UpdateCategorySelection()
         {
-            _canExecuteCommands = false;
-
-            foreach (var category in Categories)
+            try
             {
-                category.IsSelected = SelectedCategories.Cast<TaskCategory>().Any(y => y.Id == category.Id);
+                _canExecuteCommands = false;
+
+                VisibleClearCategory = SelectedCategories.Any();
+
+                foreach (var category in Categories)
+                {
+                    category.IsSelected = SelectedCategories.Cast<TaskCategory>().Any(y => y.Id == category.Id);
+                }
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
+        }
+
+        private void UpdateTaskSelection()
+        {
+            try
+            {
+                _canExecuteCommands = false;
+
+                VisibleClearTask = SelectedTasks.Any();
+                VisibleEditTask = SelectedTasks.Count == 1;
+
+                foreach (var task in Tasks)
+                {
+                    task.IsSelected = SelectedTasks.Cast<MyTask>().Any(y => y.Id == task.Id);
+                }
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
+        }
+
+        [RelayCommand]
+        private async void TaskEdit(string isEdit)
+        {
+            await _navigationService.NavigateToPage<NewTaskView>(
+                (isEdit == "edit" && SelectedTasks?.Count == 1) ? SelectedTasks.FirstOrDefault() : null
+            );
+        }
+
+        public async Task<List<(MyTask, GenericResponse<MyTask>)>> DeleteTasks()
+        {
+            List<(MyTask, GenericResponse<MyTask>)> errorTask = new();
+            List<int> differentCategoryIds = new();
+
+            foreach (MyTask task in SelectedTasks.Cast<MyTask>()) { 
+                var result = App.TaskRepo.DeleteItem(task);
+
+                if (result.HasError) errorTask.Add((task, result));
+                else if (!differentCategoryIds.Any(x => x == task.CategoryId))
+                {
+                    differentCategoryIds.Add(task.CategoryId);
+                }
             }
 
-            _canExecuteCommands = true;
+            foreach (int categoryId in differentCategoryIds)
+            {
+                await UpdateCategoryInfo(categoryId);
+            }
+
+            return errorTask;
+        }
+
+        private static async Task<GenericResponse<TaskCategory>> UpdateCategoryInfo(int categoryId)
+        {
+            var category = App.TaskCategoryRepo.GetItemWithChildren(categoryId);
+
+            if (category.HasError || category.Result == null) return category;
+
+            if (category.Result.MyTasks.Count == 0)
+            {
+                category.Result.Percentage = 1;
+                category.Result.PendingTasks = 0;
+                return await App.TaskCategoryRepo.SaveItem(category.Result);
+            }
+
+            var categoryTasks = category.Result.MyTasks ??= new();
+            var completedTasks = category.Result.MyTasks.Where(x => x.Completed).Count();
+
+            category.Result.PendingTasks = category.Result.MyTasks.Count - completedTasks;
+            category.Result.Percentage = (float)completedTasks / (float)categoryTasks.Count;
+
+            var result = await App.TaskCategoryRepo.SaveItem(category.Result);
+
+            return result;
         }
 
         [RelayCommand]

@@ -1,30 +1,52 @@
-using GeneralApp.Abstractions.Interfaces;
-using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.ViewModels;
-using System.Collections.ObjectModel;
+using GeneralApp.Services;
+using System.Text;
 
 namespace GeneralApp.MVVM.Views.TaskManager;
 
 public partial class TaskerHomeView : ContentPage
 {
     private readonly TaskerHomeViewModel _taskerHomeViewModel;
-    private readonly INavigationService _navigationService;
+    private readonly DialogService _dialogService;
 
     public TaskerHomeView(
         TaskerHomeViewModel taskerHomeViewModel,
-        INavigationService navigationService
+        DialogService dialogService
         )
     {
         InitializeComponent();
         _taskerHomeViewModel = taskerHomeViewModel;
-        _navigationService = navigationService;
+        _dialogService = dialogService;
         BindingContext = _taskerHomeViewModel;
     }
 
-    private async void Button_Clicked(object sender, EventArgs e)
+    private async void DeleteTasks(object sender, EventArgs e)
     {
-        await _navigationService.NavigateToPage<NewTaskView>(
-                new Tuple<ObservableCollection<MyTask>, ObservableCollection<TaskCategory>>(_taskerHomeViewModel.Tasks, _taskerHomeViewModel.Categories)
-            );
+        var tasksToDeleteCount = _taskerHomeViewModel.SelectedTasks.Count;
+        bool confirmDelete = await DisplayAlert("CONFIRM", $"Delete {tasksToDeleteCount} tasks?", "Yes", "No");
+
+        if (!confirmDelete) return;
+
+        var errors = await _taskerHomeViewModel.DeleteTasks();
+
+        if (errors.Any())
+        {
+            StringBuilder stringBuilder = new();
+
+            stringBuilder.Append("Error trying to delete task(s) with Id(s): ");
+            foreach ( var error in errors )
+            {
+                stringBuilder.Append($"{error.Item1.Id}, ");
+            }
+            stringBuilder.Append("sorry :(");
+
+            await _dialogService.SnackbarErrorAsync(stringBuilder.ToString());
+        } else
+        {
+            await _dialogService.SnackbarSuccessAsync("Task(s) deleted!");
+        }
+
+        _taskerHomeViewModel.SelectedCategories.Clear();
+        _taskerHomeViewModel.RefreshTasks();
     }
 }
