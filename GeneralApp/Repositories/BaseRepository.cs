@@ -22,11 +22,11 @@ namespace GeneralApp.Repositories
             connection.CreateTable<T>();
         }
 
-        public GenericResponse<T> DeleteItem(T item)
+        public GenericResponse<T> DeleteItem(T item, bool recursive = false)
         {
             try
             {
-                connection.Delete(item, true);
+                connection.Delete(item, recursive);
 
                 return new GenericResponse<T> { StatusMessage = $"Item deleted.", Result = item };
             }

@@ -21,6 +21,7 @@ namespace GeneralApp.MVVM.ViewModels
 
         public bool VisibleClearCategory { get; set; }
         public bool VisibleClearTask { get; set; }
+        public bool VisibleEditCategory { get; set; }
         public bool VisibleEditTask { get; set; }
 
         public IAsyncRelayCommand PullToRefreshCommand { get; set; }
@@ -33,8 +34,6 @@ namespace GeneralApp.MVVM.ViewModels
             SelectedCategories = new();
             SelectedTasks = new();
             Tasks = new();
-
-            PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
         }
 
         private bool _canExecPullToRefreshCommand = true;
@@ -61,6 +60,7 @@ namespace GeneralApp.MVVM.ViewModels
             SelectedTasks = new();
             VisibleClearCategory = false;
             VisibleClearTask = false;
+            VisibleEditCategory = false;
             VisibleEditTask = false;
             await FillData();
 
@@ -111,7 +111,7 @@ namespace GeneralApp.MVVM.ViewModels
                     return;
                 }
 
-                /*Next two lines added because MAUI will trigger the command with a task existing in the list,
+                /*Next two lines added because MAUI will trigger the command with a category existing in the list,
                   but with the Completed flag inverted. CanExecute on the command didn't stopped this from triggering. */
                 var existingTask = Tasks.FirstOrDefault(x => x.Id == task.Id);
                 if (existingTask != null && task.Completed != existingTask.Completed)
@@ -196,7 +196,7 @@ namespace GeneralApp.MVVM.ViewModels
             return Task.CompletedTask;
         }
 
-        private void RefreshCategories()
+        public void RefreshCategories()
         {
             try
             {
@@ -260,6 +260,7 @@ namespace GeneralApp.MVVM.ViewModels
                 _canExecuteCommands = false;
 
                 VisibleClearCategory = SelectedCategories.Any();
+                VisibleEditCategory = SelectedCategories.Count == 1;
 
                 foreach (var category in Categories)
                 {
@@ -300,13 +301,25 @@ namespace GeneralApp.MVVM.ViewModels
             );
         }
 
+        public async Task<GenericResponse<TaskCategory>> AddCategory(TaskCategory newCategory)
+        {
+            var verify = App.TaskCategoryRepo.GetItem(x => x.Name.ToLower() == newCategory.Name.ToLower());
+            if (verify.Result != null) return new GenericResponse<TaskCategory> { HasError = true, StatusMessage = $"Category {newCategory.Name} already exists." };
+
+            await App.TaskCategoryRepo.SaveItem(newCategory);
+
+            Categories.Add(newCategory);
+            return new GenericResponse<TaskCategory>();
+        }
+
         public async Task<List<(MyTask, GenericResponse<MyTask>)>> DeleteTasks()
         {
             List<(MyTask, GenericResponse<MyTask>)> errorTask = new();
             List<int> differentCategoryIds = new();
 
-            foreach (MyTask task in SelectedTasks.Cast<MyTask>()) { 
-                var result = App.TaskRepo.DeleteItem(task);
+            foreach (MyTask task in SelectedTasks.Cast<MyTask>())
+            {
+                var result = App.TaskRepo.DeleteItem(task, true);
 
                 if (result.HasError) errorTask.Add((task, result));
                 else if (!differentCategoryIds.Any(x => x == task.CategoryId))
@@ -321,6 +334,20 @@ namespace GeneralApp.MVVM.ViewModels
             }
 
             return errorTask;
+        }
+
+        public async Task<List<(TaskCategory, GenericResponse<TaskCategory>)>> DeleteCategories()
+        {
+            List<(TaskCategory, GenericResponse<TaskCategory>)> errorCategory = new();
+
+            foreach (TaskCategory category in SelectedCategories.Cast<TaskCategory>())
+            {
+                var result = App.TaskCategoryRepo.DeleteItem(category, true);
+
+                if (result.HasError) errorCategory.Add((category, result));
+            }
+
+            return errorCategory;
         }
 
         private static async Task<GenericResponse<TaskCategory>> UpdateCategoryInfo(int categoryId)

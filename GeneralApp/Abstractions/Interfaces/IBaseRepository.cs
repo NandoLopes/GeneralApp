@@ -15,6 +15,6 @@ namespace GeneralApp.Interfaces
         GenericResponse<List<T>> GetItems();
         GenericResponse<List<T>> GetItems(Expression<Func<T, bool>> predicate);
         GenericResponse<List<T>> GetItemsWithChildren();
-        GenericResponse<T> DeleteItem(T item);
+        GenericResponse<T> DeleteItem(T item, bool recursive = false);
     }
 }

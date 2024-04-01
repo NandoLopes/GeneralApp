@@ -57,17 +57,43 @@
 
     <Grid Margin="15" RowDefinitions=".2*, .7*, .1*">
         <Grid RowDefinitions=".2*, .8*">
-            <Grid>
+            <Grid ColumnDefinitions="*,auto,auto,auto">
                 <Label Text="CATEGORIES"
                        StyleClass="SubHeader"
                        HeightRequest="40"
                        VerticalTextAlignment="Center"
                        VerticalOptions="Center"/>
-                <Button IsVisible="{Binding VisibleClearCategory}"
+                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory}"
                         CornerRadius="10" 
                         Text="X"
                         Command="{Binding ClearCategorySelectionCommand}"
                         HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button Grid.Column="2"
+                        BorderColor="#E63940"
+                        TextColor="#E63940"
+                        BorderWidth="3"
+                        Margin="10,0"
+                        IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10"
+                        Text="X"
+                        Clicked="DeleteCategories"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button Grid.Column="1"
+                        BorderColor="#5bc0de"
+                        TextColor="#5bc0de"
+                        BorderWidth="3"
+                        Margin="10,0"
+                        IsVisible="{Binding VisibleEditCategory}"
+                        CornerRadius="10"
+                        Text="E"
+                        Clicked="AddCategoryClicked"
+                        HorizontalOptions="Center"
                         VerticalOptions="Center"
                         HeightRequest="40"
                         WidthRequest="40"/>
