@@ -336,7 +336,7 @@ namespace GeneralApp.MVVM.ViewModels
             return errorTask;
         }
 
-        public async Task<List<(TaskCategory, GenericResponse<TaskCategory>)>> DeleteCategories()
+        public List<(TaskCategory, GenericResponse<TaskCategory>)> DeleteCategories()
         {
             List<(TaskCategory, GenericResponse<TaskCategory>)> errorCategory = new();
 

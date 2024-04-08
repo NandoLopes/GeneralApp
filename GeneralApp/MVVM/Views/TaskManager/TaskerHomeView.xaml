@@ -42,7 +42,7 @@
         </Style>
     </ContentPage.Resources>
 
-    <ContentPage.ToolbarItems>
+    <!--<ContentPage.ToolbarItems>
         <ToolbarItem
         StyleId="Item1"
         Order="Secondary"
@@ -53,7 +53,7 @@
         Order="Secondary"
         Text="Item 2"
         />
-    </ContentPage.ToolbarItems>
+    </ContentPage.ToolbarItems>-->
 
     <Grid Margin="15" RowDefinitions=".2*, .7*, .1*">
         <Grid RowDefinitions=".2*, .8*">

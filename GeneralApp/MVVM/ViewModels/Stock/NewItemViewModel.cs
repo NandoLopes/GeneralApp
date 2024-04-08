@@ -8,6 +8,7 @@ namespace GeneralApp.MVVM.ViewModels.Stock
     public partial class NewItemViewModel : ViewModelBase
     {
         public ObservableCollection<ProductCategory> Categories { get; set; }
+        public ProductCategory SelectedCategory { get; set; }
         public StockItem NewStockItem { get; set; }
         public string Quantity { get; set; }
         public bool IsValid { get; set; }
@@ -24,11 +25,13 @@ namespace GeneralApp.MVVM.ViewModels.Stock
         {
             if (parameter is StockItem stockItem)
             {
+                Title = "Edit Item";
                 NewStockItem = stockItem;
                 Quantity = NewStockItem.Quantity.ToString();
             }
             else
             {
+                Title = "New Item";
                 NewStockItem = new();
                 Quantity = string.Empty;
             }
@@ -40,11 +43,22 @@ namespace GeneralApp.MVVM.ViewModels.Stock
         private async void Appearing()
         {
             await FillData();
+
+            if (NewStockItem.Id != 0)
+            {
+                SelectedCategory = Categories.FirstOrDefault(x => x.Id == NewStockItem.ProductCategoryId);
+            }
+
             Validate();
         }
 
         public async Task<GenericResponse<StockItem>> SaveButton()
         {
+            var verify = App.StockRepo.GetItem(x => (x.Product.ToLower() == NewStockItem.Product.ToLower()) &&
+                                                    (x.Id != NewStockItem.Id));
+
+            if (verify.Result != null) return new GenericResponse<StockItem> { HasError = true, StatusMessage = "There is another item with this name." };
+
             return await App.StockRepo.SaveItemWithChildren(NewStockItem);
         }
 

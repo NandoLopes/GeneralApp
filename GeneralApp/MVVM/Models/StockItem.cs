@@ -8,7 +8,7 @@ namespace GeneralApp.MVVM.Models
     [AddINotifyPropertyChangedInterface]
     public class StockItem : TableData
     {
-        [Unique, NotNull, MaxLength(30)]
+        [NotNull, MaxLength(30)]
         public string Product { get; set; }
 
         [ForeignKey(typeof(ProductCategory))]
@@ -26,5 +26,8 @@ namespace GeneralApp.MVVM.Models
 
         [ManyToMany(typeof(TaskStock), CascadeOperations = CascadeOperation.CascadeRead)]
         public List<MyTask>? MyTasks { get; set; }
+
+        [Ignore]
+        public bool IsSelected { get; set; }
     }
 }

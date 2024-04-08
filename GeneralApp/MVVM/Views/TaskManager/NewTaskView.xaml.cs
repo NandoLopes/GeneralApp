@@ -20,8 +20,6 @@ public partial class NewTaskView : ContentPage
 
     private async void AddTaskClicked(object sender, EventArgs e)
     {
-		//Updated old category if edit
-
 		var selectedCategory =
 			_newTaskViewModel.SelectedCategory;
 

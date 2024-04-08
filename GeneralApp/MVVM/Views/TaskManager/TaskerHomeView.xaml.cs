@@ -59,7 +59,7 @@ public partial class TaskerHomeView : ContentPage
 
         if (!confirmDelete) return;
 
-        var errors = await _taskerHomeViewModel.DeleteCategories();
+        var errors = _taskerHomeViewModel.DeleteCategories();
 
         if (errors.Any())
         {

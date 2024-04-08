@@ -13,7 +13,7 @@ namespace GeneralApp.MVVM.Models
 
         public string Color { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<StockItem>? StockItems { get; set; }
 
         [Ignore]

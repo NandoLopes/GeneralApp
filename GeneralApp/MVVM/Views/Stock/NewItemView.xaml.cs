@@ -20,6 +20,8 @@ public partial class NewItemView : ContentPage
 
     private async void SaveItemClicked(object sender, EventArgs e)
     {
+        _newItemViewModel.NewStockItem.ProductCategory = _newItemViewModel.SelectedCategory;
+
         var result = await _newItemViewModel.SaveButton();
 
         if (result.HasError)
@@ -36,8 +38,14 @@ public partial class NewItemView : ContentPage
     {
         var picker = (Picker)sender;
 
-        if (picker.SelectedItem == null || picker.SelectedIndex != 0)
+        if (picker.SelectedItem == null)
         {
+            _newItemViewModel.Validate();
+            return;
+        } 
+        else if (picker.SelectedIndex > 0) 
+        {
+            _newItemViewModel.NewStockItem.ProductCategory = _newItemViewModel.SelectedCategory;
             _newItemViewModel.Validate();
             return;
         }
@@ -83,6 +91,7 @@ public partial class NewItemView : ContentPage
             await _dialogService.SnackbarSuccessAsync("Category created!");
 
             _newItemViewModel.NewStockItem.ProductCategory = _newItemViewModel.Categories.FirstOrDefault(x => x.Name == category);
+            _newItemViewModel.SelectedCategory = _newItemViewModel.NewStockItem.ProductCategory;
             _newItemViewModel.Validate();
         }
     }
@@ -99,6 +108,10 @@ public partial class NewItemView : ContentPage
         if (!checkBox.IsChecked)
         {
             _newItemViewModel.NewStockItem.ExpirationDate = null;
+        } 
+        else if (checkBox.IsChecked)
+        {
+            _newItemViewModel.NewStockItem.ExpirationDate = DateTime.Now.AddDays(1);
         }
     }
 

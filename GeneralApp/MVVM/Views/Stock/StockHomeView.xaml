@@ -24,29 +24,71 @@
                 </VisualStateGroupList>
             </Setter>
         </Style>
+
+        <Style TargetType="Border">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
     </ContentPage.Resources>
 
     <Grid Margin="15" RowDefinitions=".2*, .8*">
         <Grid RowDefinitions=".2*, .8*">
-            <Grid>
+            <Grid ColumnDefinitions="*,auto,auto,auto">
                 <Label Text="CATEGORIES"
                        StyleClass="SubHeader"
                        HeightRequest="40"
                        VerticalTextAlignment="Center"
                        VerticalOptions="Center"/>
-                <Button IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
-                        CornerRadius="10"
+                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10" 
+                        Text="X"
+                        Command="{Binding ClearCategorySelectionCommand}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
+                        CornerRadius="10" 
                         Text="+"
                         Clicked="AddCategoryClicked"
                         HorizontalOptions="End"
                         VerticalOptions="Center"
                         HeightRequest="40"
                         WidthRequest="40"/>
-                <Button IsVisible="{Binding VisibleClearCategory}"
-                        CornerRadius="10" 
-                        Text="x"
-                        Command="{Binding ClearCategorySelectionCommand}"
-                        HorizontalOptions="End"
+                <Button Grid.Column="2"
+                        BorderColor="#E63940"
+                        TextColor="#E63940"
+                        BorderWidth="3"
+                        Margin="10,0"
+                        IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10"
+                        Text="X"
+                        Clicked="DeleteCategories"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button Grid.Column="1"
+                        BorderColor="#5bc0de"
+                        TextColor="#5bc0de"
+                        BorderWidth="3"
+                        Margin="10,0"
+                        IsVisible="{Binding VisibleEditCategory}"
+                        CornerRadius="10"
+                        Text="E"
+                        Clicked="AddCategoryClicked"
+                        HorizontalOptions="Center"
                         VerticalOptions="Center"
                         HeightRequest="40"
                         WidthRequest="40"/>
@@ -83,7 +125,8 @@
                                                      Spacing="10">
                                 <Label Text="{Binding StockCount, StringFormat='{0} Items'}"/>
                                 <Label StyleClass="CardTitle"
-                                           Text="{Binding Name}"/>
+                                       Text="{Binding Name}"
+                                       TextColor="{Binding Color, Converter={StaticResource ColorConverter}}"/>
                             </VerticalStackLayout>
                         </Grid>
                     </DataTemplate>
@@ -96,20 +139,68 @@
                HorizontalOptions="Center">
             <Grid RowDefinitions=".1*, .9*"
                   HorizontalOptions="CenterAndExpand">
-                <Grid BackgroundColor="#bcbdbd"
-                      HorizontalOptions="FillAndExpand"
-                      Padding="10,5,10,5">
-                    <Label StyleClass="SubHeader" 
+                <Grid ColumnDefinitions="*, auto, auto, auto"
+                      BackgroundColor="#bcbdbd"
+                      VerticalOptions="FillAndExpand"
+                      HorizontalOptions="FillAndExpand">
+                    <Label Margin="10,5"
                            Text="PRODUCTS"
-                           VerticalTextAlignment="Center"/>
+                           StyleClass="SubHeader"
+                           HeightRequest="40"
+                           VerticalTextAlignment="Center"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="3"
+                            Margin="10,0"
+                            BorderWidth="3"
+                            BorderColor="DarkGray"
+                            IsVisible="{Binding VisibleClearProduct}"
+                            CornerRadius="10"
+                            Text="X"
+                            Command="{Binding ClearProductSelectionCommand}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
+                    <Button Grid.Column="3"
+                            Margin="10,0"
+                            BorderWidth="3"
+                            BorderColor="DarkGray"
+                            IsVisible="{Binding VisibleClearProduct, Converter={toolkit:InvertedBoolConverter}}"
+                            CornerRadius="10"
+                            Text="+"
+                            Clicked="AddProductClicked"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
+                    <Button Grid.Column="2"
+                            BorderColor="#E63940"
+                            TextColor="#E63940"
+                            BorderWidth="3"
+                            Margin="10,0"
+                            IsVisible="{Binding VisibleClearProduct}"
+                            CornerRadius="10"
+                            Text="X"
+                            Clicked="DeleteProducts"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
+                    <Button Grid.Column="1"
+                            BorderColor="#5bc0de"
+                            TextColor="#5bc0de"
+                            BorderWidth="3"
+                            Margin="10,0"
+                            IsVisible="{Binding VisibleEditProduct}"
+                            CornerRadius="10"
+                            Text="E"
+                            Command="{Binding ProductEditCommand}"
+                            CommandParameter="edit"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
                 </Grid>
-                
-                <Button CornerRadius="10" 
-                    Text="+"
-                    Clicked="AddProductClicked"
-                    HorizontalOptions="End"
-                    HeightRequest="40"
-                    WidthRequest="40"/>
 
                 <RefreshView Grid.Row="1"
                              VerticalOptions="FillAndExpand"
@@ -122,18 +213,43 @@
                     <CollectionView ItemsSource="{Binding StockItems}"
                                     x:Name="collectionView"
                                     ItemsUpdatingScrollMode="KeepLastItemInView"
-                                    HorizontalOptions="Center">
+                                    HorizontalOptions="Center"
+                                    SelectionMode="Multiple"
+                                    SelectedItems="{Binding SelectedProducts}"
+                                    SelectionChangedCommand="{Binding ProductSelectionChangedCommand}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame StyleClass="ListFrame"
-                                       Margin="0,5,0,5">
-                                    <VerticalStackLayout>
-                                        <Label Text="{Binding Product}" VerticalOptions="Center" FontAttributes="Bold" FontSize="Medium"/>
+                                <Border Margin="0,5,0,5">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+
+                                    <Border.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="true">
+                                            <Setter Property="BackgroundColor"
+                                                Value="Gray"/>
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="Border"
+                                                 Value="false">
+                                            <Setter Property="BackgroundColor"
+                                                Value="LightGray"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+
+                                    <VerticalStackLayout Margin="10">
+                                        <Label Text="{Binding Product}" 
+                                               VerticalOptions="Center" 
+                                               FontAttributes="Bold" FontSize="Medium"
+                                               TextColor="{Binding ProductCategory.Color, Converter={StaticResource ColorConverter}}"/>
                                         <Label Text="{Binding Quantity, StringFormat='In stock: {0}'}"/>
                                         <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d}'}"
                                            IsVisible="{Binding Expires}"/>
                                     </VerticalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

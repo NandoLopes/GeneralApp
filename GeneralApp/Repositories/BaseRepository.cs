@@ -138,8 +138,6 @@ namespace GeneralApp.Repositories
 
         public async Task<GenericResponse<T>> SaveItemWithChildren(T item, bool recursive = false)
         {
-            connection.InsertWithChildren(item, recursive);
-
             try
             {
                 if (item.Id != 0)
@@ -150,7 +148,7 @@ namespace GeneralApp.Repositories
                 }
                 else
                 {
-                    connection.InsertWithChildren(item);
+                    connection.InsertWithChildren(item, recursive);
 
                     return new GenericResponse<T> { StatusMessage = $"Insert completed!", Result = item };
                 }
