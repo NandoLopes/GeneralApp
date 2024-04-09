@@ -12,7 +12,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>GeneralApp</ApplicationTitle>
+		<ApplicationTitle>General App</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.generalapp</ApplicationId>
@@ -30,12 +30,17 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-android|AnyCPU'">
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <!--"Notebook Flat Icon Vector.svg from Wikimedia Commons by Videoplasty.com, CC-BY-SA 4.0-->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundScale="0.65" Color="#Ffffff" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#Ffffff" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />

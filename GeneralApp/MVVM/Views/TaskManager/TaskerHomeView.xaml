@@ -130,7 +130,8 @@
                                                  Spacing="10">
                                 <Label Text="{Binding PendingTasks, StringFormat='{0} Tasks'}"/>
                                 <Label StyleClass="CardTitle"
-                                       Text="{Binding Name}"/>
+                                       Text="{Binding Name}"
+                                       TextColor="{Binding Color, Converter={StaticResource ColorConverter}}"/>
                                 <ProgressBar Progress="{Binding Percentage}" ProgressColor="{Binding Color, Converter={StaticResource ColorConverter}}"/>
                             </VerticalStackLayout>
                         </Grid>
