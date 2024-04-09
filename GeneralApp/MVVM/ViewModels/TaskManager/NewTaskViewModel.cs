@@ -15,18 +15,18 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
         {
             Categories = new();
             NewTask = new();
-            SelectedCategory = new();
 
             if (parameter == null)
             {
                 Title = "Add Task";
+                SelectedCategory = null;
                 return Task.CompletedTask;
             } 
             else if (parameter is MyTask newparameter)
             {
                 Title = "Edit Task";
                 NewTask = newparameter;
-                SelectedCategory = NewTask.Category ?? new();
+                SelectedCategory = NewTask.Category ?? null;
             }
 
             return Task.CompletedTask;
@@ -51,7 +51,8 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
 
             await App.TaskCategoryRepo.SaveItem(newCategory);
 
-            Categories.Add(newCategory);
+            SelectedCategory = null;
+            RefreshCategories();
             return new GenericResponse<TaskCategory>();
         }
 
@@ -140,7 +141,7 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
 
                 foreach (var category in Categories)
                 {
-                    category.IsSelected = SelectedCategory.Id == category.Id;
+                    category.IsSelected = SelectedCategory?.Id == category.Id;
                 }
             }
             finally
