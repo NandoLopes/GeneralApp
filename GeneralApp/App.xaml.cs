@@ -1,5 +1,4 @@
-﻿using GeneralApp.MVVM.Home;
-using GeneralApp.MVVM.Models;
+﻿using GeneralApp.MVVM.Models;
 using GeneralApp.MVVM.Views.TaskManager;
 using GeneralApp.Repositories;
 
@@ -28,7 +27,6 @@ public partial class App : Application
         StockRepo = stockRepo;
         TaskProductRepo = taskProductRepo;
 
-        MainPage = new NavigationPage(home);  //<--- Official
-        //MainPage = new NavigationPage(new TaskerHomeView());
+        MainPage = new NavigationPage(home);
     }
 }

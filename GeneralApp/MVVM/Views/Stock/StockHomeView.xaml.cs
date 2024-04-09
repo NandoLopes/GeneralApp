@@ -97,7 +97,7 @@ public partial class StockHomeView : ContentPage
             await _dialogService.SnackbarSuccessAsync("Item(s) deleted!");
         }
 
-        _viewModel.SelectedCategories.Clear();
+        _viewModel.SelectedProducts.Clear();
         _viewModel.RefreshStock();
     }
 

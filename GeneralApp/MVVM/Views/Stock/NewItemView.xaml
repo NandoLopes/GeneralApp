@@ -12,6 +12,7 @@
                 <RoundRectangle/>
                 <Picker x:Name="picker"
                         Title="Select Category"
+                        TextColor="Black"
                         Margin="10"
                         ItemsSource="{Binding Categories}"
                         ItemDisplayBinding="{Binding Name}"
@@ -29,7 +30,8 @@
                     <Entry Grid.Column="1"
                            Placeholder="Product Name"
                            VerticalOptions="Center"
-                           PlaceholderColor="Gray"
+                           PlaceholderColor="DarkGray"
+                           TextColor="Black"
                            Text="{Binding NewStockItem.Product}"
                            TextChanged="Entry_TextChanged"/>
                 </Grid>
@@ -44,7 +46,8 @@
                     <Entry Grid.Column="1"
                            Placeholder="0"
                            VerticalOptions="Center"
-                           PlaceholderColor="Gray"
+                           PlaceholderColor="DarkGray"
+                           TextColor="Black"
                            Keyboard="Numeric"
                            Text="{Binding Quantity}"
                            TextChanged="Quantity_TextChanged"/>
@@ -64,6 +67,7 @@
                                       HorizontalOptions="End"
                                       Margin="10"
                                       x:Name="dateCheckBox"
+                                      Color="Black"
                                       IsChecked="{Binding NewStockItem.Expires, Mode=TwoWay}"
                                       CheckedChanged="DateCheckBox_CheckedChanged"/>
                         </Grid>
@@ -78,6 +82,7 @@
                                    Margin="10"/>
                             <DatePicker Grid.Column="1"
                                         VerticalOptions="Center"
+                                        TextColor="Black"
                                         Date="{Binding NewStockItem.ExpirationDate, Mode=TwoWay}"/>
                         </Grid>
                     </toolkit:Expander.Content>

@@ -52,28 +52,38 @@ namespace GeneralApp.MVVM.ViewModels.Stock
         [RelayCommand]
         private void Appearing()
         {
-            _canExecuteCommands = false;
+            try
+            {
+                _canExecuteCommands = false;
 
-            SelectedCategories = new();
-            SelectedProducts = new();
-            VisibleClearCategory = false;
-            VisibleEditCategory = false;
-            VisibleEditProduct = false;
-            FillData();
-
-            _canExecuteCommands = true;
+                SelectedCategories = new();
+                SelectedProducts = new();
+                VisibleClearCategory = false;
+                VisibleEditCategory = false;
+                VisibleEditProduct = false;
+                FillData();
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
         }
 
         [RelayCommand(CanExecute = nameof(CanExecuteCommands))]
         private void CategorySelectionChanged()
         {
-            _canExecuteCommands = false;
+            try
+            {
+                _canExecuteCommands = false;
 
-            VisibleClearCategory = SelectedCategories.Any();
-            UpdateCategorySelection();
-            RefreshStock();
-
-            _canExecuteCommands = true;
+                ClearProductSelection();
+                UpdateCategorySelection();
+                RefreshStock();
+            }
+            finally
+            {
+                _canExecuteCommands = true;
+            }
         }
 
         [RelayCommand]
@@ -213,6 +223,7 @@ namespace GeneralApp.MVVM.ViewModels.Stock
             }
             finally
             {
+                UpdateCategorySelection();
                 _canExecuteCommands = true;
             }
         }
