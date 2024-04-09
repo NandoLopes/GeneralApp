@@ -23,7 +23,7 @@ public partial class NewTaskView : ContentPage
 		var selectedCategory =
 			_newTaskViewModel.SelectedCategory;
 
-        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name.Trim()))
+        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name?.Trim()))
         {
             await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
 			return;
@@ -33,9 +33,9 @@ public partial class NewTaskView : ContentPage
         {
             await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
         }
-		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name.Trim()))
+		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name?.Trim()))
 		{
-            _newTaskViewModel.NewTask.Name = _newTaskViewModel.NewTask.Name.Trim();
+            _newTaskViewModel.NewTask.Name = _newTaskViewModel.NewTask.Name?.Trim();
 
 			var result = await _newTaskViewModel.AddTask();
 

@@ -34,10 +34,10 @@ public partial class StockHomeView : ContentPage
         var category = _viewModel.SelectedCategories.Count == 1 ? _viewModel.SelectedCategories[0] as ProductCategory : new();
         string categoryName =
             (await DisplayPromptAsync("New Category",
-            "Write the new categoryName name",
+            "Write the new category name",
             maxLength: 15,
             keyboard: Keyboard.Text,
-            initialValue: category.Name)).Trim();
+            initialValue: category.Name))?.Trim();
 
         if (categoryName == null)
         {

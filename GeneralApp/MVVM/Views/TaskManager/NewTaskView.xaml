@@ -25,7 +25,9 @@
 
     <Grid RowDefinitions=".2*, .7*, .1*">
         <Entry Placeholder="Enter New Task"
+               PlaceholderColor="DarkGray"
                Text="{Binding NewTask.Name}"
+               TextColor="Black"
                Style="{StaticResource Task}"/>
 
         <Grid Grid.Row="1">

@@ -308,7 +308,8 @@ namespace GeneralApp.MVVM.ViewModels
 
             await App.TaskCategoryRepo.SaveItem(newCategory);
 
-            Categories.Add(newCategory);
+            SelectedCategories.Clear();
+            RefreshCategories();
             return new GenericResponse<TaskCategory>();
         }
 
