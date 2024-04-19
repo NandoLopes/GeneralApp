@@ -10,13 +10,13 @@ public partial class App : Application
     public static BaseRepository<StockItem> StockRepo { get; private set; }
     public static BaseRepository<TaskCategory> TaskCategoryRepo { get; private set; }
     public static BaseRepository<ProductCategory> ProductCategoryRepo { get; private set; }
-    public static BaseRepository<TaskStock> TaskProductRepo { get; private set; }
+    public static BaseRepository<TaskItem> TaskProductRepo { get; private set; }
 
     public App(BaseRepository<MyTask> taskRepo,
                BaseRepository<TaskCategory> taskCategoryRepo,
                BaseRepository<ProductCategory> productCategoryRepo,
                BaseRepository<StockItem> stockRepo,
-               BaseRepository<TaskStock> taskProductRepo,
+               BaseRepository<TaskItem> taskProductRepo,
                TaskerHomeView home)
     {
         InitializeComponent();

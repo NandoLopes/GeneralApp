@@ -6,7 +6,7 @@ using SQLiteNetExtensions.Attributes;
 namespace GeneralApp.MVVM.Models
 {
     [AddINotifyPropertyChangedInterface]
-    public class TaskStock : TableData
+    public class TaskItem : TableData
     {
         [ForeignKey(typeof(MyTask))]
         public int TaskId { get; set; }

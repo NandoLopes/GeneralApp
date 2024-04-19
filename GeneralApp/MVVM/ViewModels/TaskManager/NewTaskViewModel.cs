@@ -51,8 +51,9 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
 
             await App.TaskCategoryRepo.SaveItem(newCategory);
 
-            SelectedCategory = null;
             RefreshCategories();
+            SelectedCategory = Categories.FirstOrDefault(x => x.Name == newCategory.Name);
+
             return new GenericResponse<TaskCategory>();
         }
 

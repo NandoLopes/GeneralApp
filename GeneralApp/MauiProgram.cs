@@ -89,7 +89,7 @@ public static class MauiProgram
         mauiAppBuilder.Services.AddSingleton<BaseRepository<MyTask>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<ProductCategory>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskCategory>>();
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskStock>>();
+        mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskItem>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<StockItem>>();
         return mauiAppBuilder;
     }

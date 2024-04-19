@@ -24,7 +24,7 @@ namespace GeneralApp.MVVM.Models
         [NotNull]
         public int Quantity { get; set; }
 
-        [ManyToMany(typeof(TaskStock), CascadeOperations = CascadeOperation.CascadeRead)]
+        [ManyToMany(typeof(TaskItem), CascadeOperations = CascadeOperation.CascadeRead)]
         public List<MyTask>? MyTasks { get; set; }
 
         [Ignore]
