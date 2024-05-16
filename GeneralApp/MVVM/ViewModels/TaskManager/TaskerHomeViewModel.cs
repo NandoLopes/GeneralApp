@@ -24,7 +24,6 @@ namespace GeneralApp.MVVM.ViewModels
         public bool VisibleEditCategory { get; set; }
         public bool VisibleEditTask { get; set; }
 
-        public IAsyncRelayCommand PullToRefreshCommand { get; set; }
 
         public TaskerHomeViewModel(INavigationService navigationService)
         {
@@ -39,9 +38,8 @@ namespace GeneralApp.MVVM.ViewModels
         private bool _canExecPullToRefreshCommand = true;
 
         private bool CanExecPullToRefreshCommand() => _canExecPullToRefreshCommand;
-        private async Task ExecPullToRefreshCommand()
-        {
-            if (_canExecPullToRefreshCommand)
+        [RelayCommand(CanExecute = nameof(CanExecPullToRefreshCommand))]
+        private async Task PullToRefresh()
             {
                 _canExecPullToRefreshCommand = false;
 
@@ -49,7 +47,6 @@ namespace GeneralApp.MVVM.ViewModels
                 IsRefreshing = false;
                 _canExecPullToRefreshCommand = true;
             }
-        }
 
         [RelayCommand]
         private async Task Appearing()

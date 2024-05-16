@@ -21,8 +21,6 @@ namespace GeneralApp.MVVM.ViewModels.Stock
         public bool VisibleEditCategory { get; set; }
         public bool VisibleEditProduct { get; set; }
 
-        public IAsyncRelayCommand PullToRefreshCommand { get; set; }
-
         public StockHomeViewModel(INavigationService navigationService)
         {
             Categories = new();
@@ -30,23 +28,20 @@ namespace GeneralApp.MVVM.ViewModels.Stock
             SelectedProducts = new();
             StockItems = new();
 
-            PullToRefreshCommand = new AsyncRelayCommand(ExecPullToRefreshCommand, CanExecPullToRefreshCommand);
             _navigationService = navigationService;
         }
 
         private bool _canExecPullToRefreshCommand = true;
 
         private bool CanExecPullToRefreshCommand() => _canExecPullToRefreshCommand;
-        private async Task ExecPullToRefreshCommand()
+        [RelayCommand(CanExecute = nameof(CanExecPullToRefreshCommand))]
+        private async Task PullToRefresh()
         {
-            if (_canExecPullToRefreshCommand)
-            {
-                _canExecPullToRefreshCommand = false;
+            _canExecPullToRefreshCommand = false;
 
-                await FillData();
-                IsRefreshing = false;
-                _canExecPullToRefreshCommand = true;
-            }
+            await FillData();
+            IsRefreshing = false;
+            _canExecPullToRefreshCommand = true;
         }
 
         [RelayCommand]
