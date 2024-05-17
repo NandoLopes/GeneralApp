@@ -22,6 +22,17 @@ public partial class StockHomeView : ContentPage
         _dialogService = dialogService;
         _navigationService = navigationService;
         BindingContext = _viewModel;
+        _viewModel.ScrollRequested += ScrollRequested;
+    }
+
+    ~StockHomeView()
+    {
+        _viewModel.ScrollRequested -= ScrollRequested;
+    }
+
+    private void ScrollRequested(object sender, int index)
+    {
+        stockCollectionView.ScrollTo(index);
     }
 
     private async void AddProductClicked(object sender, EventArgs e)
@@ -97,7 +108,9 @@ public partial class StockHomeView : ContentPage
             await _dialogService.SnackbarSuccessAsync("Item(s) deleted!");
         }
 
+        _viewModel.SelectedCategories.Clear();
         _viewModel.SelectedProducts.Clear();
+        _viewModel.RefreshCategories();
         _viewModel.RefreshStock();
     }
 

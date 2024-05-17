@@ -83,6 +83,7 @@
                             <DatePicker Grid.Column="1"
                                         VerticalOptions="Center"
                                         TextColor="Black"
+                                        Format="dd/MM/yyyy"
                                         Date="{Binding NewStockItem.ExpirationDate, Mode=TwoWay}"/>
                         </Grid>
                     </toolkit:Expander.Content>

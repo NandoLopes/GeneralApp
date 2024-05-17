@@ -11,7 +11,7 @@ namespace GeneralApp.MVVM.Models
         [NotNull, MaxLength(30)]
         public string Name { get; set; }
 
-        public bool Completed { get; set; }
+        public bool Completed { get; set; } = false;
 
         [ForeignKey(typeof(TaskCategory)), NotNull]
         public int CategoryId { get; set; }
@@ -20,6 +20,7 @@ namespace GeneralApp.MVVM.Models
         public TaskCategory Category { get; set; }
 
         public string TaskColor { get; set; }
+        public bool HasDueDate { get; set; }
 
         public DateTime? DueDate { get; set; }
 

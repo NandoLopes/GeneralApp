@@ -13,6 +13,7 @@ namespace GeneralApp.MVVM.ViewModels
     public partial class TaskerHomeViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
+        public event EventHandler<int> ScrollRequested;
 
         public ObservableCollection<TaskCategory> Categories { get; set; }
         public ObservableCollection<MyTask> Tasks { get; set; }
@@ -23,7 +24,6 @@ namespace GeneralApp.MVVM.ViewModels
         public bool VisibleClearTask { get; set; }
         public bool VisibleEditCategory { get; set; }
         public bool VisibleEditTask { get; set; }
-
 
         public TaskerHomeViewModel(INavigationService navigationService)
         {
@@ -40,13 +40,13 @@ namespace GeneralApp.MVVM.ViewModels
         private bool CanExecPullToRefreshCommand() => _canExecPullToRefreshCommand;
         [RelayCommand(CanExecute = nameof(CanExecPullToRefreshCommand))]
         private async Task PullToRefresh()
-            {
-                _canExecPullToRefreshCommand = false;
+        {
+            _canExecPullToRefreshCommand = false;
 
-                await FillData();
-                IsRefreshing = false;
-                _canExecPullToRefreshCommand = true;
-            }
+            await FillData();
+            IsRefreshing = false;
+            _canExecPullToRefreshCommand = true;
+        }
 
         [RelayCommand]
         private async Task Appearing()
@@ -227,9 +227,7 @@ namespace GeneralApp.MVVM.ViewModels
 
                 var selectedCategories = SelectedCategories.Cast<TaskCategory>().ToList();
 
-                var it = App.TaskRepo.GetItemsWithChildrenPredicate(x => true);
-
-                var tasks = App.TaskRepo.GetItemsWithChildrenPredicate(x => selectedCategories.Any(y => y.Id == x.CategoryId) || selectedCategories.Count == 0);
+                var tasks = App.TaskRepo.GetItemsWithChildrenByDatePredicate(x => selectedCategories.Any(y => y.Id == x.CategoryId) || selectedCategories.Count == 0);
 
                 if (tasks.HasError || tasks.Result.Count == 0)
                 {
@@ -245,6 +243,8 @@ namespace GeneralApp.MVVM.ViewModels
             }
             finally
             {
+                ScrollRequested?.Invoke(this, 0);
+
                 UpdateTaskSelection();
                 _canExecuteCommands = true;
             }
@@ -291,23 +291,23 @@ namespace GeneralApp.MVVM.ViewModels
         }
 
         [RelayCommand]
-        private async void TaskEdit(string isEdit)
+        private async void TaskEdit()
         {
-            await _navigationService.NavigateToPage<NewTaskView>(
-                (isEdit == "edit" && SelectedTasks?.Count == 1) ? SelectedTasks.FirstOrDefault() : null
+            await _navigationService.NavigateToPage<NewTaskView>(SelectedTasks?.Count == 1 ? SelectedTasks.FirstOrDefault() : null
             );
         }
 
         public async Task<GenericResponse<TaskCategory>> AddCategory(TaskCategory newCategory)
         {
-            var verify = App.TaskCategoryRepo.GetItem(x => x.Name.ToLower() == newCategory.Name.ToLower());
+            var verify = App.TaskCategoryRepo.GetItem(x => (x.Name.ToLower() == newCategory.Name.ToLower()) &&
+                                                              (x.Id != newCategory.Id));
             if (verify.Result != null) return new GenericResponse<TaskCategory> { HasError = true, StatusMessage = $"Category {newCategory.Name} already exists." };
 
-            await App.TaskCategoryRepo.SaveItem(newCategory);
+            var result = await App.TaskCategoryRepo.SaveItem(newCategory);
 
             SelectedCategories.Clear();
             RefreshCategories();
-            return new GenericResponse<TaskCategory>();
+            return result;
         }
 
         public async Task<List<(MyTask, GenericResponse<MyTask>)>> DeleteTasks()

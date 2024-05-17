@@ -10,79 +10,56 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
         public ObservableCollection<TaskCategory> Categories { get; set; }
         public TaskCategory SelectedCategory { get; set; }
         public MyTask NewTask { get; set; }
+        public bool IsValid { get; set; }
 
-        public override Task OnNavigatingTo(object? parameter)
+        public NewTaskViewModel()
         {
             Categories = new();
             NewTask = new();
 
-            if (parameter == null)
+            IsValid = false;
+        }
+
+        public override Task OnNavigatingTo(object? parameter)
+        {
+            if (parameter is MyTask stockItem)
             {
-                Title = "Add Task";
-                SelectedCategory = null;
-                return Task.CompletedTask;
-            } 
-            else if (parameter is MyTask newparameter)
+                Title = "Edit Item";
+                NewTask = stockItem;
+            }
+            else
             {
-                Title = "Edit Task";
-                NewTask = newparameter;
-                SelectedCategory = NewTask.Category ?? null;
+                Title = "New Item";
+                NewTask = new();
             }
 
             return Task.CompletedTask;
         }
 
         [RelayCommand]
-        private void Appearing()
+        private async void Appearing()
         {
-            RefreshCategories();
-        }
+            await FillData();
 
-        [RelayCommand]
-        private void CategorySelectionChanged()
-        {
-            UpdateCategorySelection();
-        }
-
-        public async Task<GenericResponse<TaskCategory>> AddCategory(TaskCategory newCategory)
-        {
-            var verify = App.TaskCategoryRepo.GetItem(x => x.Name.ToLower() == newCategory.Name.ToLower());
-            if (verify.Result != null) return new GenericResponse<TaskCategory> { HasError = true, StatusMessage = $"Category {newCategory.Name} already exists." };
-
-            await App.TaskCategoryRepo.SaveItem(newCategory);
-
-            RefreshCategories();
-            SelectedCategory = Categories.FirstOrDefault(x => x.Name == newCategory.Name);
-
-            return new GenericResponse<TaskCategory>();
-        }
-
-        public async Task<GenericResponse<MyTask>> AddTask()
-        {
-            int oldCategoryId = 0;
-            var verify = App.TaskRepo.GetItem(x => x.Name.ToLower() == NewTask.Name.ToLower());
-            if (verify.Result != null && verify.Result.Id != NewTask.Id)
+            if (NewTask.Id != 0)
             {
-                return new GenericResponse<MyTask> { HasError = true, StatusMessage = $"Task {NewTask.Name} already exists." };
-            }
-            else if (verify.Result != null && verify.Result.Id == NewTask.Id && verify.Result.CategoryId != SelectedCategory.Id)
-            {
-                oldCategoryId = verify.Result.CategoryId;
+                SelectedCategory = Categories.FirstOrDefault(x => x.Id == NewTask.CategoryId);
             }
 
-            NewTask.TaskColor = SelectedCategory.Color;
-            NewTask.Category = SelectedCategory;
-            NewTask.CategoryId = SelectedCategory.Id;
-
-            var taskResult = await App.TaskRepo.SaveItem(NewTask);
-
-            await UpdateCategoryInfo(NewTask.CategoryId);
-            if (oldCategoryId > 0) await UpdateCategoryInfo(oldCategoryId);
-
-            return taskResult;
+            Validate();
         }
 
-        private static async Task<GenericResponse<TaskCategory>> UpdateCategoryInfo(int categoryId)
+        public async Task<GenericResponse<MyTask>> SaveButton()
+        {
+            var verify = App.TaskRepo.GetItem(x => (x.Name.ToLower() == NewTask.Name.ToLower()) &&
+                                                    (x.Id != NewTask.Id));
+
+            if (verify.Result != null) return new GenericResponse<MyTask> { HasError = true, StatusMessage = "There is another task with this name." };
+
+            return await App.TaskRepo.SaveItemWithChildren(NewTask);
+        }
+
+        public async Task<GenericResponse<TaskCategory>> UpdateCategoryInfo(int categoryId)
         {
             var category = App.TaskCategoryRepo.GetItemWithChildren(categoryId);
 
@@ -106,65 +83,50 @@ namespace GeneralApp.MVVM.ViewModels.TaskManager
             return result;
         }
 
+        private Task FillData()
+        {
+            RefreshCategories();
+
+            return Task.CompletedTask;
+        }
+
         private void RefreshCategories()
         {
-            try
+            var categories = App.TaskCategoryRepo.GetItemsWithChildren();
+
+            if (categories.HasError || categories.Result.Count == 0)
             {
-                _canExecuteCommands = false;
-
-                var categories = App.TaskCategoryRepo.GetItemsWithChildren();
-
-                if (categories.HasError || categories.Result.Count == 0)
+                Categories = new()
                 {
-                    Categories = new();
-                    return;
-                }
-
-                Categories.Clear();
-                foreach (var category in categories.Result)
-                {
-                    Categories.Add(category);
-                }
-
+                    new TaskCategory { Name = "Create Category" }
+                };
+                return;
             }
-            finally
+
+            Categories.Clear();
+            Categories.Add(new TaskCategory { Name = "Create Category" });
+
+            foreach (var category in categories.Result)
             {
-                UpdateCategorySelection();
-                _canExecuteCommands = true;
+                Categories.Add(category);
             }
         }
 
-        private void UpdateCategorySelection()
+        public async Task<GenericResponse<TaskCategory>> AddCategory(TaskCategory newCategory)
         {
-            try
-            {
-                _canExecuteCommands = false;
+            var verify = App.TaskCategoryRepo.GetItem(x => x.Name.ToLower() == newCategory.Name.ToLower());
+            if (verify.Result != null) return new GenericResponse<TaskCategory> { HasError = true, StatusMessage = $"Category {newCategory.Name} already exists." };
 
-                foreach (var category in Categories)
-                {
-                    category.IsSelected = SelectedCategory?.Id == category.Id;
-                }
-            }
-            finally
-            {
-                _canExecuteCommands = true;
-            }
+            await App.TaskCategoryRepo.SaveItem(newCategory);
+
+            Categories.Add(newCategory);
+            return new GenericResponse<TaskCategory>();
         }
 
-        public void RefreshCategory()
+        public void Validate()
         {
-            var categories = App.TaskCategoryRepo.GetItems();
-
-            if (!categories.HasError)
-            {
-                Categories ??= new();
-
-                Categories.Clear();
-                foreach (var c in categories.Result)
-                {
-                    Categories.Add(c);
-                }
-            }
+            IsValid = (!String.IsNullOrEmpty(NewTask.Category?.Name)
+                    && !String.IsNullOrEmpty(NewTask.Name?.Trim()));
         }
     }
 }

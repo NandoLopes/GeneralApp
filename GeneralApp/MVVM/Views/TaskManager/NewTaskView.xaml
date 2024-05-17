@@ -4,85 +4,99 @@
              x:Class="GeneralApp.MVVM.Views.TaskManager.NewTaskView"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              Title="{Binding Title}">
-    
-    <ContentPage.Resources>
-        <Style TargetType="Border">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor"
-                                        Value="Transparent" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
-        </Style>
-    </ContentPage.Resources>
 
-    <Grid RowDefinitions=".2*, .7*, .1*">
-        <Entry Placeholder="Enter New Task"
-               PlaceholderColor="DarkGray"
-               Text="{Binding NewTask.Name}"
-               TextColor="Black"
-               Style="{StaticResource Task}"/>
+    <Grid RowDefinitions=".8*,.2*">
+        <VerticalStackLayout Padding="20,0,20,0"
+                         Spacing="10">
+            <Grid>
+                <RoundRectangle/>
+                <Picker x:Name="picker"
+                        Title="Select Category"
+                        TextColor="Black"
+                        Margin="10"
+                        ItemsSource="{Binding Categories}"
+                        ItemDisplayBinding="{Binding Name}"
+                        SelectedItem="{Binding SelectedCategory}"
+                        SelectedIndexChanged="Picker_SelectedIndexChanged">
+                </Picker>
+            </Grid>
 
-        <Grid Grid.Row="1">
-            <CollectionView Grid.Row="1"
-                            Margin="15"
-                            ItemsSource="{Binding Categories}"
-                            SelectedItem="{Binding SelectedCategory}"
-                            SelectionMode="Single"
-                            SelectionChangedCommand="{Binding CategorySelectionChangedCommand}">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout HorizontalItemSpacing="5"
-                                     VerticalItemSpacing="5"
-                                     Orientation="Vertical"
-                                     Span="2"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Padding="10,10,10,10">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="10"/>
-                            </Border.StrokeShape>
+            <Grid>
+                <RoundRectangle/>
+                <Grid ColumnDefinitions="auto,*"
+                      Margin="10">
+                    <Label Text="Task Name:"
+                           VerticalOptions="Center"/>
+                    <Entry Grid.Column="1"
+                           Placeholder="Task Name"
+                           VerticalOptions="Center"
+                           PlaceholderColor="DarkGray"
+                           TextColor="Black"
+                           Text="{Binding NewTask.Name}"
+                           TextChanged="Entry_TextChanged"/>
+                </Grid>
+            </Grid>
 
-                            <Border.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}"
-                                             TargetType="Border"
-                                             Value="true">
-                                    <Setter Property="BackgroundColor"
-                                            Value="Gray"/>
-                                </DataTrigger>
+            <Grid>
+                <toolkit:Expander IsExpanded="{Binding Source={x:Reference dateCheckBox}, Path=IsChecked}">
 
-                                <DataTrigger Binding="{Binding IsSelected}"
-                                             TargetType="Border"
-                                             Value="false">
-                                    <Setter Property="BackgroundColor"
-                                            Value="LightGray"/>
-                                </DataTrigger>
-                            </Border.Triggers>
-                            
-                            <Label Text="{Binding Name}"
-                                   TextColor="Black"/>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
-        <HorizontalStackLayout
-            Grid.Row="2"
-            Margin="10"
-            HorizontalOptions="CenterAndExpand"
-            Spacing="15"
-            VerticalOptions="Center"
-            Padding="-20">
-            <Button CornerRadius="15" Text="Save Task" Clicked="AddTaskClicked"/>
-            <Button CornerRadius="15" Text="Add Category" Clicked="AddCategoryClicked"/>
-        </HorizontalStackLayout>
+                    <toolkit:Expander.Header>
+                        <Grid ColumnDefinitions="auto,*">
+                            <RoundRectangle HorizontalOptions="CenterAndExpand" Grid.ColumnSpan="2"/>
+                            <Label Text="Has Due Date?"
+                                   VerticalOptions="Center"
+                                   Margin="10"/>
+                            <CheckBox Grid.Column="1"
+                                      HorizontalOptions="End"
+                                      Margin="10"
+                                      x:Name="dateCheckBox"
+                                      Color="Black"
+                                      IsChecked="{Binding NewTask.HasDueDate, Mode=TwoWay}"
+                                      CheckedChanged="DateCheckBox_CheckedChanged"/>
+                        </Grid>
+                    </toolkit:Expander.Header>
+
+                    <toolkit:Expander.Content>
+                        <Grid ColumnDefinitions="auto,*">
+                            <RoundRectangle HorizontalOptions="CenterAndExpand" Grid.ColumnSpan="2"/>
+
+                            <Label Text="Due Date:"
+                                   VerticalOptions="Center"
+                                   Margin="10"/>
+                            <DatePicker Grid.Column="1"
+                                        VerticalOptions="Center"
+                                        TextColor="Black"
+                                        Format="dd/MM/yyyy"
+                                        Date="{Binding NewTask.DueDate, Mode=TwoWay}"/>
+                        </Grid>
+                    </toolkit:Expander.Content>
+                </toolkit:Expander>
+            </Grid>
+        </VerticalStackLayout>
+
+        <Button Grid.Row="1"
+                BackgroundColor="#04AA6D"
+                VerticalOptions="CenterAndExpand"
+                Margin="20"
+                IsEnabled="False"
+                Text="Save"
+                Clicked="SaveItemClicked">
+            <Button.Triggers>
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsValid}"
+                             Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
+                    <Setter Property="Opacity" Value="0.5"/>
+                </DataTrigger>
+
+                <DataTrigger TargetType="Button"
+                             Binding="{Binding IsValid}"
+                             Value="True">
+                    <Setter Property="IsEnabled" Value="True"/>
+                    <Setter Property="Opacity" Value="1.0"/>
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
     </Grid>
 
     <ContentPage.Behaviors>

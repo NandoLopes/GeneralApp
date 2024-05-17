@@ -42,20 +42,16 @@
         </Style>
     </ContentPage.Resources>
 
-    <!--<ContentPage.ToolbarItems>
+    <ContentPage.ToolbarItems>
         <ToolbarItem
         StyleId="Item1"
         Order="Secondary"
-        Text="Item 1"
+        Text="Stock"
+        Command="{Binding StockCommand}"
         />
-        <ToolbarItem
-        StyleId="Item2"
-        Order="Secondary"
-        Text="Item 2"
-        />
-    </ContentPage.ToolbarItems>-->
+    </ContentPage.ToolbarItems>
 
-    <Grid Margin="15" RowDefinitions=".2*, .7*, .1*">
+    <Grid Margin="15" RowDefinitions=".2*, .8*">
         <Grid RowDefinitions=".2*, .8*">
             <Grid ColumnDefinitions="*,auto,auto,auto">
                 <Label Text="CATEGORIES"
@@ -67,6 +63,14 @@
                         CornerRadius="10" 
                         Text="X"
                         Command="{Binding ClearCategorySelectionCommand}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40"/>
+                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
+                        CornerRadius="10" 
+                        Text="+"
+                        Clicked="AddCategoryClicked"
                         HorizontalOptions="End"
                         VerticalOptions="Center"
                         HeightRequest="40"
@@ -167,6 +171,18 @@
                             VerticalOptions="Center"
                             HeightRequest="40"
                             WidthRequest="40"/>
+                    <Button Grid.Column="3"
+                            Margin="10,0"
+                            BorderWidth="3"
+                            BorderColor="DarkGray"
+                            IsVisible="{Binding VisibleClearTask, Converter={toolkit:InvertedBoolConverter}}"
+                            CornerRadius="10"
+                            Text="+"
+                            Command="{Binding TaskEditCommand}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="40"
+                            WidthRequest="40"/>
                     <Button Grid.Column="2"
                             BorderColor="#E63940"
                             TextColor="#E63940"
@@ -189,7 +205,6 @@
                             CornerRadius="10"
                             Text="E"
                             Command="{Binding TaskEditCommand}"
-                            CommandParameter="edit"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HeightRequest="40"
@@ -205,7 +220,7 @@
                              Margin="10,5,10,5">
 
                     <CollectionView ItemsSource="{Binding Tasks}"
-                                    x:Name="collectionView"
+                                    x:Name="taskCollectionView"
                                     ItemsUpdatingScrollMode="KeepLastItemInView"
                                     HorizontalOptions="Center"
                                     SelectionMode="Multiple"
@@ -234,30 +249,36 @@
                                         </DataTrigger>
                                     </Border.Triggers>
 
-                                    <HorizontalStackLayout Margin="10">
-                                        <CheckBox x:Name="checkBox"
+                                    <VerticalStackLayout Margin="10">
+                                        <HorizontalStackLayout>
+                                            <CheckBox x:Name="checkBox"
                                                   Scale="1.5"
                                                   IsChecked="{Binding Completed}"
                                                   VerticalOptions="Center"
                                                   Color="{Binding Category.Color, Converter={StaticResource ColorConverter}}">
-                                            <CheckBox.Behaviors>
-                                                <toolkit:EventToCommandBehavior EventName="CheckedChanged"
-                                                    Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.CheckedChangedCommand}"
+                                                <CheckBox.Behaviors>
+                                                    <toolkit:EventToCommandBehavior EventName="CheckedChanged"
+                                                    Command="{Binding Source={x:Reference taskCollectionView}, Path=BindingContext.CheckedChangedCommand}"
                                                     CommandParameter="{Binding .}"/>
-                                            </CheckBox.Behaviors>
-                                        </CheckBox>
+                                                </CheckBox.Behaviors>
+                                            </CheckBox>
 
-                                        <Label Text="{Binding Name}" VerticalOptions="Center">
-                                            <Label.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
+                                            <Label Text="{Binding Name}" VerticalOptions="Center">
+                                                <Label.Triggers>
+                                                    <DataTrigger Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
                                                              TargetType="Label"
                                                              Value="True">
-                                                    <Setter Property="TextDecorations"
+                                                        <Setter Property="TextDecorations"
                                                         Value="Strikethrough"/>
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </HorizontalStackLayout>
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </HorizontalStackLayout>
+
+                                        <Label Margin="10,0,10,5"
+                                               Text="{Binding DueDate, StringFormat='Due to: {0:d/M/yyyy}'}"
+                                               IsVisible="{Binding HasDueDate}"/>
+                                    </VerticalStackLayout>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -265,25 +286,6 @@
                 </RefreshView>
             </Grid>
         </Frame>
-        <Grid Grid.Row="2"
-              ColumnDefinitions="*,*"
-              Padding="0"
-              ColumnSpacing="10">
-            <Button
-                HorizontalOptions="FillAndExpand"
-                BackgroundColor="DarkGray"
-                Command="{Binding StockCommand}"
-                Text="Stock"
-                Margin="0,10,0,10"/>
-            <Button
-                Grid.Column="1"
-                HorizontalOptions="FillAndExpand"
-                BackgroundColor="DarkGray"
-                Command="{Binding TaskEditCommand}"
-                CommandParameter=""
-                Text="Add Task"
-                Margin="0,10,0,10"/>
-        </Grid>
     </Grid>
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior Command="{Binding AppearingCommand}" EventName="Appearing" />

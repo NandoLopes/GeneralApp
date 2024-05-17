@@ -211,7 +211,7 @@
                              Margin="10,5,10,5">
 
                     <CollectionView ItemsSource="{Binding StockItems}"
-                                    x:Name="collectionView"
+                                    x:Name="stockCollectionView"
                                     ItemsUpdatingScrollMode="KeepLastItemInView"
                                     HorizontalOptions="Center"
                                     SelectionMode="Multiple"
@@ -246,7 +246,7 @@
                                                FontAttributes="Bold" FontSize="Medium"
                                                TextColor="{Binding ProductCategory.Color, Converter={StaticResource ColorConverter}}"/>
                                         <Label Text="{Binding Quantity, StringFormat='In stock: {0}'}"/>
-                                        <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d}'}"
+                                        <Label Text="{Binding ExpirationDate, StringFormat='Expiration Date: {0:d/M/yyyy}'}"
                                            IsVisible="{Binding Expires}"/>
                                     </VerticalStackLayout>
                                 </Border>

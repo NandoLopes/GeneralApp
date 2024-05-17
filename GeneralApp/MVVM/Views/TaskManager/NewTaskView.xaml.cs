@@ -6,91 +6,117 @@ namespace GeneralApp.MVVM.Views.TaskManager;
 
 public partial class NewTaskView : ContentPage
 {
-    private readonly NewTaskViewModel _newTaskViewModel;
+    private readonly NewTaskViewModel _viewModel;
     private readonly DialogService _dialogService;
 
-    public NewTaskView(NewTaskViewModel newTaskViewModel,
+    public NewTaskView(NewTaskViewModel viewModel,
 					   DialogService dialogService)
-	{
-		InitializeComponent();
-        _newTaskViewModel = newTaskViewModel;
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
         _dialogService = dialogService;
-        BindingContext = _newTaskViewModel;
+        BindingContext = _viewModel;
     }
 
-    private async void AddTaskClicked(object sender, EventArgs e)
+    private async void SaveItemClicked(object sender, EventArgs e)
     {
-		var selectedCategory =
-			_newTaskViewModel.SelectedCategory;
+        _viewModel.NewTask.Category = _viewModel.SelectedCategory;
 
-        if (string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name?.Trim()))
+        var taskSaveResult = await _viewModel.SaveButton();
+
+        if (taskSaveResult.HasError)
         {
-            await DisplayAlert("Empty Field", "You must fill the task field", "Ok");
-			return;
+            await DisplayAlert("Error", taskSaveResult.StatusMessage, "Ok");
+            return;
         }
 
-        if (selectedCategory == null)
+        var categoryUpdateResult = await _viewModel.UpdateCategoryInfo(taskSaveResult.Result.CategoryId);
+
+        if (categoryUpdateResult.HasError)
         {
-            await DisplayAlert("Invalid Selection", "You must select a category", "Ok");
+            await DisplayAlert("Error", categoryUpdateResult.StatusMessage, "Ok");
+            return;
         }
-		else if (selectedCategory != null && !string.IsNullOrEmpty(_newTaskViewModel.NewTask.Name?.Trim()))
-		{
-            _newTaskViewModel.NewTask.Name = _newTaskViewModel.NewTask.Name?.Trim();
 
-			var result = await _newTaskViewModel.AddTask();
-
-            if (result.HasError)
-            {
-                await DisplayAlert("Error", result.StatusMessage, "Ok");
-                return;
-            }
-
-            await _dialogService.SnackbarSuccessAsync("Item saved!");
-            await Navigation.PopAsync();
-		}
-		else
-		{
-            await DisplayAlert("Error", "Something went wrong :(", "Ok");
-        }
+        await _dialogService.SnackbarSuccessAsync("Task saved!");
+        await Navigation.PopAsync();
     }
 
-    private async void AddCategoryClicked(object sender, EventArgs e)
+    private async void Picker_SelectedIndexChanged(object sender, EventArgs e)
     {
-		string category =
-			await DisplayPromptAsync("New Category",
-			"Write the new category name",
-			maxLength: 15,
-			keyboard: Keyboard.Text);
+        var picker = (Picker)sender;
 
-		if (category == null)
-		{
-			return;
-		}
-		else if (string.IsNullOrEmpty(category.Trim()))
-		{
+        if (picker.SelectedItem == null)
+        {
+            _viewModel.Validate();
+            return;
+        }
+        else if (picker.SelectedIndex > 0)
+        {
+            _viewModel.NewTask.Category = _viewModel.SelectedCategory;
+            _viewModel.Validate();
+            return;
+        }
+
+        string category =
+            await DisplayPromptAsync("New Category",
+            "Write the new category name",
+            maxLength: 15,
+            keyboard: Keyboard.Text);
+
+        if (category == null)
+        {
+            _viewModel.Validate();
+            return;
+        }
+        else if (string.IsNullOrEmpty(category.Trim()))
+        {
             await DisplayAlert("Error", "The new Category needs a name!", "Ok");
-			return;
-		}
-
-		//TODO - Chose color.
-		var r = new Random();
-
-		var result = await _newTaskViewModel.AddCategory(new TaskCategory
-		{
-			Name = category.Trim(),
-			Color = Color.FromRgb(
-				r.Next(0, 255),
-				r.Next(0, 255),
-				r.Next(0, 255)).ToHex()
-		});
-
-		if (result.HasError)
-        {
-			await DisplayAlert("Error", result.StatusMessage, "Ok");
+            picker.SelectedItem = null;
+            _viewModel.Validate();
+            return;
         }
-		else
-		{
-			await _dialogService.SnackbarSuccessAsync("Category created!");
-		}
+
+        //TODO - Chose color.
+        var color = System.Drawing.Color.FromArgb(category.GetHashCode());
+
+        var result = await _viewModel.AddCategory(new TaskCategory
+        {
+            Name = category.Trim(),
+            Color = Color.FromRgb(color.R, color.G, color.B).ToHex()
+        });
+
+        if (result.HasError)
+        {
+            await DisplayAlert("Error", result.StatusMessage, "Ok");
+            _viewModel.Validate();
+        }
+        else
+        {
+            await _dialogService.SnackbarSuccessAsync("Category created!");
+
+            _viewModel.NewTask.Category = _viewModel.Categories.FirstOrDefault(x => x.Name == category);
+            _viewModel.SelectedCategory = _viewModel.NewTask.Category;
+            _viewModel.Validate();
+        }
+    }
+
+    private void Entry_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _viewModel.Validate();
+    }
+
+    private void DateCheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        var checkBox = sender as CheckBox;
+
+        if (!checkBox.IsChecked)
+        {
+            _viewModel.NewTask.DueDate = null;
+        }
+        else if (checkBox.IsChecked)
+        {
+            _viewModel.NewTask.DueDate = DateTime.Now.AddDays(7);
+        }
     }
 }

@@ -6,25 +6,25 @@ namespace GeneralApp;
 
 public partial class App : Application
 {
-    public static BaseRepository<MyTask> TaskRepo { get; private set; }
-    public static BaseRepository<StockItem> StockRepo { get; private set; }
+    public static TaskRepository TaskRepo { get; private set; }
+    public static StockRepository StockRepo { get; private set; }
     public static BaseRepository<TaskCategory> TaskCategoryRepo { get; private set; }
     public static BaseRepository<ProductCategory> ProductCategoryRepo { get; private set; }
     public static BaseRepository<TaskItem> TaskProductRepo { get; private set; }
 
-    public App(BaseRepository<MyTask> taskRepo,
+    public App(TaskRepository taskRepo,
+               StockRepository stockRepo,
                BaseRepository<TaskCategory> taskCategoryRepo,
                BaseRepository<ProductCategory> productCategoryRepo,
-               BaseRepository<StockItem> stockRepo,
                BaseRepository<TaskItem> taskProductRepo,
                TaskerHomeView home)
     {
         InitializeComponent();
 
         TaskRepo = taskRepo;
+        StockRepo = stockRepo;
         TaskCategoryRepo = taskCategoryRepo;
         ProductCategoryRepo = productCategoryRepo;
-        StockRepo = stockRepo;
         TaskProductRepo = taskProductRepo;
 
         MainPage = new NavigationPage(home);

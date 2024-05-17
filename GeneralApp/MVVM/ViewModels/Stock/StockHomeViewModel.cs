@@ -10,6 +10,7 @@ namespace GeneralApp.MVVM.ViewModels.Stock
     public partial class StockHomeViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
+        public event EventHandler<int> ScrollRequested;
 
         public ObservableCollection<ProductCategory> Categories { get; set; }
         public ObservableCollection<object> SelectedCategories { get; set; } //.NET MAUI bug won't update SelectedItems if not in an "object" type list.
@@ -230,7 +231,7 @@ namespace GeneralApp.MVVM.ViewModels.Stock
                 _canExecuteCommands = false;
 
                 var selectedCategories = SelectedCategories.Cast<ProductCategory>().ToList();
-                var items = App.StockRepo.GetItemsWithChildrenPredicate(x => selectedCategories.Any(y => y.Id == x.ProductCategory?.Id) || selectedCategories.Count == 0);
+                var items = App.StockRepo.GetItemsWithChildrenByDatePredicate(x => selectedCategories.Any(y => y.Id == x.ProductCategory?.Id) || selectedCategories.Count == 0);
 
                 if (items.HasError || items.Result.Count == 0)
                 {
@@ -246,6 +247,8 @@ namespace GeneralApp.MVVM.ViewModels.Stock
             }
             finally
             {
+                ScrollRequested?.Invoke(this, 0);
+
                 UpdateProductSelection();
                 _canExecuteCommands = true;
             }

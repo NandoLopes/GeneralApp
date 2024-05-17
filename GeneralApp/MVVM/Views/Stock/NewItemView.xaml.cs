@@ -50,18 +50,19 @@ public partial class NewItemView : ContentPage
             return;
         }
 
-        string category =
+        string categoryName =
             await DisplayPromptAsync("New Category",
-            "Write the new category name",
+            "Write the new categoryName name",
             maxLength: 15,
             keyboard: Keyboard.Text);
 
-        if (category == null)
+        if (categoryName == null)
         {
             _newItemViewModel.Validate();
+            picker.SelectedItem = null;
             return;
         }
-        else if (string.IsNullOrEmpty(category.Trim()))
+        else if (string.IsNullOrEmpty(categoryName.Trim()))
         {
             await DisplayAlert("Error", "The new Category needs a name!", "Ok");
             picker.SelectedItem = null;
@@ -70,16 +71,13 @@ public partial class NewItemView : ContentPage
         }
 
         //TODO - Chose color.
-        var r = new Random();
+        var color = System.Drawing.Color.FromArgb(categoryName.GetHashCode());
+        var category = new ProductCategory() { 
+            Name = categoryName.Trim(),
+            Color = Color.FromRgb(color.R, color.G, color.B).ToHex()
+        };
 
-        var result = await _newItemViewModel.AddCategory(new ProductCategory
-        {
-            Name = category.Trim(),
-            Color = Color.FromRgb(
-                r.Next(0, 255),
-                r.Next(0, 255),
-                r.Next(0, 255)).ToHex()
-        });
+        var result = await _newItemViewModel.AddCategory(category);
 
         if (result.HasError)
         {
@@ -90,7 +88,7 @@ public partial class NewItemView : ContentPage
         {
             await _dialogService.SnackbarSuccessAsync("Category created!");
 
-            _newItemViewModel.NewStockItem.ProductCategory = _newItemViewModel.Categories.FirstOrDefault(x => x.Name == category);
+            _newItemViewModel.NewStockItem.ProductCategory = _newItemViewModel.Categories.FirstOrDefault(x => x.Name == categoryName);
             _newItemViewModel.SelectedCategory = _newItemViewModel.NewStockItem.ProductCategory;
             _newItemViewModel.Validate();
         }
@@ -126,12 +124,11 @@ public partial class NewItemView : ContentPage
         if (!isInt)
         {
             _newItemViewModel.NewStockItem.Quantity = 0;
-            _newItemViewModel.Validate();
         } else
         {
             _newItemViewModel.NewStockItem.Quantity = quantity >= 0 ? quantity : 0;
-            _newItemViewModel.Validate();
         }
 
+        _newItemViewModel.Validate();
     }
 }

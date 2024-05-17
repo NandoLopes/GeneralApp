@@ -86,11 +86,11 @@ public static class MauiProgram
 
     public static MauiAppBuilder RegisterRepositories(this MauiAppBuilder mauiAppBuilder)
     {
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<MyTask>>();
+        mauiAppBuilder.Services.AddSingleton<TaskRepository>();
+        mauiAppBuilder.Services.AddSingleton<StockRepository>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<ProductCategory>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskCategory>>();
         mauiAppBuilder.Services.AddSingleton<BaseRepository<TaskItem>>();
-        mauiAppBuilder.Services.AddSingleton<BaseRepository<StockItem>>();
         return mauiAppBuilder;
     }
 
