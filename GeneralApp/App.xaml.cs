@@ -16,8 +16,7 @@ public partial class App : Application
                StockRepository stockRepo,
                BaseRepository<TaskCategory> taskCategoryRepo,
                BaseRepository<ProductCategory> productCategoryRepo,
-               BaseRepository<TaskItem> taskProductRepo,
-               TaskerHomeView home)
+               BaseRepository<TaskItem> taskProductRepo)
     {
         InitializeComponent();
 
@@ -27,6 +26,6 @@ public partial class App : Application
         ProductCategoryRepo = productCategoryRepo;
         TaskProductRepo = taskProductRepo;
 
-        MainPage = new NavigationPage(home);
+        MainPage = new AppShell();
     }
 }

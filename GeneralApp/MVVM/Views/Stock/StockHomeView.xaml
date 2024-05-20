@@ -4,6 +4,7 @@
              x:Class="GeneralApp.MVVM.Views.Stock.StockHomeView"
              xmlns:converters="clr-namespace:GeneralApp.Shared.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:shared="clr-namespace:GeneralApp.Shared"
              Title="Stock" StyleClass="Header">
 
     <ContentPage.Resources>
@@ -50,48 +51,77 @@
                        HeightRequest="40"
                        VerticalTextAlignment="Center"
                        VerticalOptions="Center"/>
-                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory}"
-                        CornerRadius="10" 
-                        Text="X"
-                        Command="{Binding ClearCategorySelectionCommand}"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        HeightRequest="40"
-                        WidthRequest="40"/>
-                <Button Grid.Column="3" IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
-                        CornerRadius="10" 
-                        Text="+"
-                        Clicked="AddCategoryClicked"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        HeightRequest="40"
-                        WidthRequest="40"/>
-                <Button Grid.Column="2"
-                        BorderColor="#E63940"
-                        TextColor="#E63940"
-                        BorderWidth="3"
-                        Margin="10,0"
+                <Button Grid.Column="3"
+                        BorderColor="DarkGray"
+                        BorderWidth="2"
                         IsVisible="{Binding VisibleClearCategory}"
                         CornerRadius="10"
-                        Text="X"
+                        Command="{Binding ClearCategorySelectionCommand}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Close}"
+                                         Color="Black"
+                                         Size="25"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Grid.Column="3"
+                        BorderColor="DarkGray"
+                        BorderWidth="2"
+                        IsVisible="{Binding VisibleClearCategory, Converter={toolkit:InvertedBoolConverter}}"
+                        CornerRadius="10"
+                        Clicked="AddCategoryClicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        HeightRequest="40"
+                        WidthRequest="40">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Add}"
+                                         Color="Black"
+                                         Size="25"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Grid.Column="2"
+                        BorderColor="#E63940"
+                        BackgroundColor="Transparent"
+                        BorderWidth="2"
+                        IsVisible="{Binding VisibleClearCategory}"
+                        CornerRadius="10"
                         Clicked="DeleteCategories"
                         HorizontalOptions="Center"
                         VerticalOptions="Center"
                         HeightRequest="40"
-                        WidthRequest="40"/>
+                        WidthRequest="40">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Delete}"
+                                         Color="#E63940"
+                                         Size="25"/>
+                    </Button.ImageSource>
+                </Button>
                 <Button Grid.Column="1"
                         BorderColor="#5bc0de"
-                        TextColor="#5bc0de"
-                        BorderWidth="3"
+                        BackgroundColor="Transparent"
+                        BorderWidth="2"
                         Margin="10,0"
                         IsVisible="{Binding VisibleEditCategory}"
                         CornerRadius="10"
-                        Text="E"
                         Clicked="AddCategoryClicked"
                         HorizontalOptions="Center"
                         VerticalOptions="Center"
                         HeightRequest="40"
-                        WidthRequest="40"/>
+                        WidthRequest="40">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Edit}"
+                                         Color="#5bc0de"
+                                         Size="25"/>
+                    </Button.ImageSource>
+                </Button>
             </Grid>
             <CollectionView Grid.Row="1" 
                             ItemsSource="{Binding Categories}"
@@ -122,7 +152,7 @@
                                 </RoundRectangle.Triggers>
                             </RoundRectangle>
                             <VerticalStackLayout Padding="15"
-                                                     Spacing="10">
+                                                     Spacing="5">
                                 <Label Text="{Binding StockCount, StringFormat='{0} Items'}"/>
                                 <Label StyleClass="CardTitle"
                                        Text="{Binding Name}"
@@ -150,56 +180,76 @@
                            VerticalTextAlignment="Center"
                            VerticalOptions="Center"/>
                     <Button Grid.Column="3"
-                            Margin="10,0"
-                            BorderWidth="3"
+                            BorderWidth="2"
                             BorderColor="DarkGray"
                             IsVisible="{Binding VisibleClearProduct}"
                             CornerRadius="10"
-                            Text="X"
                             Command="{Binding ClearProductSelectionCommand}"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HeightRequest="40"
-                            WidthRequest="40"/>
+                            WidthRequest="40">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Close}"
+                                         Color="Black"
+                                         Size="25"/>
+                        </Button.ImageSource>
+                    </Button>
                     <Button Grid.Column="3"
-                            Margin="10,0"
-                            BorderWidth="3"
+                            BorderWidth="2"
                             BorderColor="DarkGray"
                             IsVisible="{Binding VisibleClearProduct, Converter={toolkit:InvertedBoolConverter}}"
                             CornerRadius="10"
-                            Text="+"
                             Clicked="AddProductClicked"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HeightRequest="40"
-                            WidthRequest="40"/>
+                            WidthRequest="40">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Add}"
+                                         Color="Black"
+                                         Size="25"/>
+                        </Button.ImageSource>
+                    </Button>
                     <Button Grid.Column="2"
                             BorderColor="#E63940"
                             TextColor="#E63940"
-                            BorderWidth="3"
-                            Margin="10,0"
+                            BorderWidth="2"
                             IsVisible="{Binding VisibleClearProduct}"
                             CornerRadius="10"
-                            Text="X"
                             Clicked="DeleteProducts"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HeightRequest="40"
-                            WidthRequest="40"/>
+                            WidthRequest="40">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Delete}"
+                                         Color="#E63940"
+                                         Size="25"/>
+                        </Button.ImageSource>
+                    </Button>
                     <Button Grid.Column="1"
                             BorderColor="#5bc0de"
                             TextColor="#5bc0de"
-                            BorderWidth="3"
-                            Margin="10,0"
+                            BorderWidth="2"
                             IsVisible="{Binding VisibleEditProduct}"
                             CornerRadius="10"
-                            Text="E"
                             Command="{Binding ProductEditCommand}"
                             CommandParameter="edit"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"
                             HeightRequest="40"
-                            WidthRequest="40"/>
+                            WidthRequest="40">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcon"
+                                         Glyph="{x:Static shared:Icons.Edit}"
+                                         Color="#5bc0de"
+                                         Size="25"/>
+                        </Button.ImageSource>
+                    </Button>
                 </Grid>
 
                 <RefreshView Grid.Row="1"

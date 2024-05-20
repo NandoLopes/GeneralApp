@@ -14,6 +14,7 @@ namespace GeneralApp.Repositories
                 var result = connection.GetAllWithChildren<MyTask>().OrderBy(x => x.DueDate == null)
                                                                     .ThenBy(x => x.DueDate)
                                                                     .ThenBy(x => x.Completed)
+                                                                    .ThenBy(x => x.Name)
                                                                     .Where(predicate).ToList();
 
                 return new GenericResponse<List<MyTask>> { Result = result };

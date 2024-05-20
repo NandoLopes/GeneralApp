@@ -32,6 +32,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcon");
             });
 
 #if DEBUG
@@ -46,6 +47,7 @@ public static class MauiProgram
     public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
     {
         mauiAppBuilder.Services.AddSingleton<INavigationService, NavigationService>();
+        mauiAppBuilder.Services.AddSingleton<IShellNavigationService, ShellNavigationService>();
         mauiAppBuilder.Services.AddSingleton<DialogService>();
         return mauiAppBuilder;
     }

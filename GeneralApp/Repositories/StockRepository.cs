@@ -13,6 +13,7 @@ namespace GeneralApp.Repositories
             {
                 var result = connection.GetAllWithChildren<StockItem>().OrderBy(x => x.ExpirationDate == null)
                                                                     .ThenBy(x => x.ExpirationDate)
+                                                                    .ThenBy(x => x.Product)
                                                                     .Where(predicate).ToList();
 
                 return new GenericResponse<List<StockItem>> { Result = result };

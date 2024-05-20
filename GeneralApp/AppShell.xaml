@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="GeneralApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:taskManager="clr-namespace:GeneralApp.MVVM.Views.TaskManager"
+    xmlns:stock="clr-namespace:GeneralApp.MVVM.Views.Stock"
+    xmlns:shared="clr-namespace:GeneralApp.Shared"
+    Shell.FlyoutBehavior="Disabled">
+    <TabBar>
+        <ShellContent
+            Title="Tasks"
+            ContentTemplate="{DataTemplate taskManager:TaskerHomeView}"
+            Route="TaskerHomeView">
+            <ShellContent.Icon>
+                <FontImageSource FontFamily="MaterialIcon" Glyph="{x:Static shared:Icons.Delete}"/>
+            </ShellContent.Icon>
+        </ShellContent>
+
+        <ShellContent
+            Title="Stock"
+            ContentTemplate="{DataTemplate stock:StockHomeView}"
+            Route="StockHomeView">
+            <ShellContent.Icon>
+                <FontImageSource FontFamily="MaterialIcon" Glyph="{x:Static shared:Icons.Inventory}"/>
+            </ShellContent.Icon>
+        </ShellContent>
+    </TabBar>
+</Shell>
